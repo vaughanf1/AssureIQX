@@ -12,7 +12,7 @@ AssureXRay delivers a reproducible, auditable 3-class bone tumor classification 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Scaffold and Infrastructure** - Project skeleton, config, Makefile, reproducibility utilities
+- [x] **Phase 1: Scaffold and Infrastructure** - Project skeleton, config, Makefile, reproducibility utilities
 - [ ] **Phase 2: Data Acquisition and Audit** - Download BTXRD, profile the dataset, produce audit and spec documents
 - [ ] **Phase 3: Splits and Dataset Loader** - Dual split strategy, split manifests, PyTorch dataset class, augmentation pipeline
 - [ ] **Phase 4: Model Training** - EfficientNet-B0 classifier, weighted loss, training loop with early stopping and checkpoints
@@ -37,7 +37,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 - [x] 01-01-PLAN.md -- Project directory structure, .gitignore, requirements.txt, and README.md
-- [ ] 01-02-PLAN.md -- Configuration system, Makefile, reproducibility utilities, and placeholder scripts
+- [x] 01-02-PLAN.md -- Configuration system, Makefile, reproducibility utilities, and placeholder scripts
 
 ### Phase 2: Data Acquisition and Audit
 **Goal**: The raw BTXRD dataset is downloaded, organized, profiled, and documented -- all data quality issues are surfaced before any modeling begins
@@ -154,7 +154,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Scaffold and Infrastructure | 1/2 | In progress | - |
+| 1. Scaffold and Infrastructure | 2/2 | Complete | 2026-02-19 |
 | 2. Data Acquisition and Audit | 0/2 | Not started | - |
 | 3. Splits and Dataset Loader | 0/2 | Not started | - |
 | 4. Model Training | 0/3 | Not started | - |
