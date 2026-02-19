@@ -36,7 +36,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 2 plans
 
 Plans:
-- [ ] 01-01-PLAN.md -- Project directory structure, .gitignore, requirements.txt, and README.md
+- [x] 01-01-PLAN.md -- Project directory structure, .gitignore, requirements.txt, and README.md
 - [ ] 01-02-PLAN.md -- Configuration system, Makefile, reproducibility utilities, and placeholder scripts
 
 ### Phase 2: Data Acquisition and Audit
@@ -154,7 +154,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Scaffold and Infrastructure | 0/2 | Planned | - |
+| 1. Scaffold and Infrastructure | 1/2 | In progress | - |
 | 2. Data Acquisition and Audit | 0/2 | Not started | - |
 | 3. Splits and Dataset Loader | 0/2 | Not started | - |
 | 4. Model Training | 0/3 | Not started | - |
