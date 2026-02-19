@@ -1,0 +1,63 @@
+# AssureXRay — Central Configuration
+# All hyperparameters, paths, and seeds in one place.
+# Override any value via CLI: --override training.batch_size=64
+
+seed: 42
+device: auto  # auto | cpu | cuda
+
+# ── Data ─────────────────────────────────────────────
+data:
+  raw_dir: data/raw
+  splits_dir: data/splits
+  image_size: 224
+  num_workers: 4
+  figshare_url: "https://figshare.com/ndownloader/articles/21899338/versions/1"
+
+# ── Model ────────────────────────────────────────────
+model:
+  backbone: efficientnet_b0
+  pretrained: true
+  num_classes: 3
+  dropout: 0.2
+  class_names:
+    - Normal
+    - Benign
+    - Malignant
+
+# ── Training ─────────────────────────────────────────
+training:
+  batch_size: 32
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  epochs: 50
+  early_stopping_patience: 7
+  scheduler: cosine
+  class_weights: auto
+  loss_type: cross_entropy
+  split_strategy: stratified
+
+# ── Evaluation ───────────────────────────────────────
+evaluation:
+  bootstrap_iterations: 1000
+  confidence_level: 0.95
+  split_strategies:
+    - stratified
+    - center
+
+# ── Grad-CAM ────────────────────────────────────────
+gradcam:
+  target_layer: auto
+  examples_per_class: 3
+  methods:
+    - GradCAM
+
+# ── Inference ────────────────────────────────────────
+inference:
+  default_checkpoint: checkpoints/best_stratified.pt
+
+# ── Paths ────────────────────────────────────────────
+paths:
+  checkpoints_dir: checkpoints
+  results_dir: results
+  docs_dir: docs
+  logs_dir: logs
