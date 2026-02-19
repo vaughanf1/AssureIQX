@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-19)
 
 **Core value:** Deliver a reproducible, auditable 3-class bone tumor classification baseline with clear explainability outputs that a clinician can inspect and trust.
-**Current focus:** Phase 3 - Data Splitting
+**Current focus:** Phase 3 - Data Splitting and Dataset Loader
 
 ## Current Position
 
-Phase: 2 of 8 (Data Acquisition and Audit)
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-02-19 -- Completed 02-02-PLAN.md
+Phase: 3 of 8 (Splits and Dataset Loader)
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-02-19 -- Completed 03-01-PLAN.md
 
-Progress: [████░░░░░░░░░░░░] 4/16 (25%)
+Progress: [█████░░░░░░░░░░░] 5/16 (31%)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: 6.25 min
-- Total execution time: 25 min
+- Total plans completed: 5
+- Average duration: 8 min
+- Total execution time: 40 min
 
 **By Phase:**
 
@@ -29,10 +29,11 @@ Progress: [████░░░░░░░░░░░░] 4/16 (25%)
 |-------|-------|-------|----------|
 | 01 Scaffold | 2/2 | 7 min | 3.5 min |
 | 02 Data Acquisition | 2/2 | 18 min | 9 min |
+| 03 Splits & Loader | 1/2 | 15 min | 15 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (3 min), 01-02 (4 min), 02-01 (11 min), 02-02 (7 min)
-- Trend: stable after download spike
+- Last 5 plans: 01-02 (4 min), 02-01 (11 min), 02-02 (7 min), 03-01 (15 min)
+- Trend: 03-01 higher due to phash computation over 3746 images
 
 *Updated after each plan completion*
 
@@ -61,6 +62,10 @@ Recent decisions affecting current work:
 - [02-02]: wrist-joint column is empty (all zeros) -- present in schema but no data
 - [02-02]: Mixed image_id extensions: 3,719 .jpeg + 27 .jpg
 - [02-02]: Proxy grouping: 295 groups (center+age+gender), 941 groups (+site) -- insufficient for patient-level grouping
+- [03-01]: Representative-based splitting: first duplicate group member participates in split, all members assigned to same partition
+- [03-01]: Center-holdout val_ratio=15% applied to Center 1 only (439 val images from 2938 Center 1 total)
+- [03-01]: phash hash_size=8 distance=0 for duplicate detection (21 pairs found, matches Phase 2 audit)
+- [03-01]: Split CSV format: image_id,split,label (3 columns, no index)
 
 ### Pending Todos
 
@@ -69,11 +74,11 @@ None.
 ### Blockers/Concerns
 
 - [Research]: timm EfficientNet-B0 Grad-CAM target layer name must be verified against installed version in Phase 6
-- [02-02]: 21 exact duplicate pairs should be handled in Phase 3 split (ensure same side of train/test boundary)
-- [02-02]: Center 3 has only 27 Normal images -- center-holdout with Center 3 as test will have limited Normal representation
+- [03-01]: Center 3 has only 27 Normal images in center-holdout test set -- model evaluation should note this imbalance
+- [03-01]: Same-lesion multi-angle image leakage risk documented but NOT mitigated (no patient_id available)
 
 ## Session Continuity
 
-Last session: 2026-02-19T20:30Z
-Stopped at: Completed 02-02-PLAN.md (Phase 2 complete)
+Last session: 2026-02-19T21:45Z
+Stopped at: Completed 03-01-PLAN.md
 Resume file: None
