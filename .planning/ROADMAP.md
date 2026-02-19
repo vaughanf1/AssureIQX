@@ -64,11 +64,11 @@ Plans:
   3. The PyTorch dataset class loads images from split manifests and returns correctly shaped tensors (batch, 3, 224, 224) with ImageNet normalization applied
   4. Training mode applies the full augmentation pipeline (CLAHE, horizontal flip, rotation +/-15 degrees, resize 224x224, ImageNet normalize) while validation/test modes apply only deterministic transforms (resize, normalize)
   5. The leakage risk from same-lesion multi-angle images is documented in both the split script output and referenced in the audit report, with the proxy grouping strategy (if feasible from available metadata) applied or its absence explicitly justified
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 03-01: Split strategy implementation and manifest generation
-- [ ] 03-02: PyTorch dataset class and augmentation pipeline
+- [ ] 03-01-PLAN.md -- Split utility functions and split script generating 6 CSV manifests with duplicate-aware grouping
+- [ ] 03-02-PLAN.md -- PyTorch BTXRDDataset class with albumentations augmentation pipelines and DataLoader factory
 
 ### Phase 4: Model Training
 **Goal**: A trained EfficientNet-B0 classifier exists for both split strategies, with training logs proving convergence and class-imbalance handling preventing Malignant class collapse
