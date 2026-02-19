@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Scaffold and Infrastructure** - Project skeleton, config, Makefile, reproducibility utilities
 - [x] **Phase 2: Data Acquisition and Audit** - Download BTXRD, profile the dataset, produce audit and spec documents
-- [ ] **Phase 3: Splits and Dataset Loader** - Dual split strategy, split manifests, PyTorch dataset class, augmentation pipeline
+- [x] **Phase 3: Splits and Dataset Loader** - Dual split strategy, split manifests, PyTorch dataset class, augmentation pipeline
 - [ ] **Phase 4: Model Training** - EfficientNet-B0 classifier, weighted loss, training loop with early stopping and checkpoints
 - [ ] **Phase 5: Evaluation** - Full metric suite on both splits, bootstrap CIs, comparison against paper baseline
 - [ ] **Phase 6: Explainability and Inference** - Grad-CAM heatmaps, curated gallery, annotation comparison, single-image and batch inference
@@ -67,8 +67,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 03-01-PLAN.md -- Split utility functions and split script generating 6 CSV manifests with duplicate-aware grouping
-- [ ] 03-02-PLAN.md -- PyTorch BTXRDDataset class with albumentations augmentation pipelines and DataLoader factory
+- [x] 03-01-PLAN.md -- Split utility functions and split script generating 6 CSV manifests with duplicate-aware grouping
+- [x] 03-02-PLAN.md -- PyTorch BTXRDDataset class with albumentations augmentation pipelines and DataLoader factory
 
 ### Phase 4: Model Training
 **Goal**: A trained EfficientNet-B0 classifier exists for both split strategies, with training logs proving convergence and class-imbalance handling preventing Malignant class collapse
@@ -156,7 +156,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 |-------|----------------|--------|-----------|
 | 1. Scaffold and Infrastructure | 2/2 | Complete | 2026-02-19 |
 | 2. Data Acquisition and Audit | 2/2 | Complete | 2026-02-19 |
-| 3. Splits and Dataset Loader | 0/2 | Not started | - |
+| 3. Splits and Dataset Loader | 2/2 | Complete | 2026-02-20 |
 | 4. Model Training | 0/3 | Not started | - |
 | 5. Evaluation | 0/2 | Not started | - |
 | 6. Explainability and Inference | 0/2 | Not started | - |

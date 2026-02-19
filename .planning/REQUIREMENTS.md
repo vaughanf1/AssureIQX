@@ -12,15 +12,15 @@ Requirements for initial PoC release. Each maps to roadmap phases.
 - [x] **DATA-01**: Download script fetches BTXRD dataset from figshare and organizes into `data_raw/` (images/, annotations/, dataset.csv)
 - [x] **DATA-02**: Data audit report covering class distribution, image dimension histogram, missing values, annotation coverage, duplicate detection, per-center breakdown
 - [x] **DATA-03**: Dataset specification document describing all 37 columns, label derivation logic (malignant=1 -> Malignant, benign=1 -> Benign, tumor=0 -> Normal), and data provenance
-- [ ] **DATA-04**: Primary split: image-level stratified train/val/test (70/15/15) with class-label stratification and fixed random seed
-- [ ] **DATA-05**: Secondary split: center holdout (Center 1 -> train/val, Centers 2+3 -> test) with stratified train/val within Center 1
-- [ ] **DATA-06**: Split manifests saved as CSV files with image_id, split assignment, and label
-- [ ] **DATA-07**: Leakage risk explicitly documented in audit report and PoC report (no patient_id, same-lesion multi-angle images)
+- [x] **DATA-04**: Primary split: image-level stratified train/val/test (70/15/15) with class-label stratification and fixed random seed
+- [x] **DATA-05**: Secondary split: center holdout (Center 1 -> train/val, Centers 2+3 -> test) with stratified train/val within Center 1
+- [x] **DATA-06**: Split manifests saved as CSV files with image_id, split assignment, and label
+- [x] **DATA-07**: Leakage risk explicitly documented in audit report and PoC report (no patient_id, same-lesion multi-angle images)
 
 ### Model Training
 
-- [ ] **TRAIN-01**: PyTorch dataset class loading images + labels from split manifests with configurable transforms
-- [ ] **TRAIN-02**: Augmentation pipeline: resize 224x224, ImageNet normalization, CLAHE (albumentations), horizontal flip, small rotation (+/-15 degrees)
+- [x] **TRAIN-01**: PyTorch dataset class loading images + labels from split manifests with configurable transforms
+- [x] **TRAIN-02**: Augmentation pipeline: resize 224x224, ImageNet normalization, CLAHE (albumentations), horizontal flip, small rotation (+/-15 degrees)
 - [ ] **TRAIN-03**: EfficientNet-B0 backbone via timm with pretrained ImageNet weights, 3-class output head
 - [ ] **TRAIN-04**: Inverse-frequency weighted cross-entropy loss for class imbalance
 - [ ] **TRAIN-05**: Training script with configurable hyperparameters via YAML config (lr, batch_size, epochs, patience, backbone, loss_type)
@@ -121,12 +121,12 @@ Deferred to future work. Tracked but not in current roadmap.
 | DATA-03 | Phase 2 | Complete |
 | DOCS-01 | Phase 2 | Complete |
 | DOCS-02 | Phase 2 | Complete |
-| DATA-04 | Phase 3 | Pending |
-| DATA-05 | Phase 3 | Pending |
-| DATA-06 | Phase 3 | Pending |
-| DATA-07 | Phase 3 | Pending |
-| TRAIN-01 | Phase 3 | Pending |
-| TRAIN-02 | Phase 3 | Pending |
+| DATA-04 | Phase 3 | Complete |
+| DATA-05 | Phase 3 | Complete |
+| DATA-06 | Phase 3 | Complete |
+| DATA-07 | Phase 3 | Complete |
+| TRAIN-01 | Phase 3 | Complete |
+| TRAIN-02 | Phase 3 | Complete |
 | TRAIN-03 | Phase 4 | Pending |
 | TRAIN-04 | Phase 4 | Pending |
 | TRAIN-05 | Phase 4 | Pending |
@@ -157,4 +157,4 @@ Deferred to future work. Tracked but not in current roadmap.
 
 ---
 *Requirements defined: 2026-02-19*
-*Last updated: 2026-02-19 after Phase 2 completion*
+*Last updated: 2026-02-20 after Phase 3 completion*
