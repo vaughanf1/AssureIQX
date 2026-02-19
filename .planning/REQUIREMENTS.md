@@ -11,16 +11,16 @@ Requirements for initial PoC release. Each maps to roadmap phases.
 
 - [ ] **DATA-01**: Download script fetches BTXRD dataset from figshare and organizes into `data_raw/` (images/, annotations/, dataset.csv)
 - [ ] **DATA-02**: Data audit report covering class distribution, image dimension histogram, missing values, annotation coverage, duplicate detection, per-center breakdown
-- [ ] **DATA-03**: Dataset specification document describing all 37 columns, label derivation logic (malignant=1 → Malignant, benign=1 → Benign, tumor=0 → Normal), and data provenance
+- [ ] **DATA-03**: Dataset specification document describing all 37 columns, label derivation logic (malignant=1 -> Malignant, benign=1 -> Benign, tumor=0 -> Normal), and data provenance
 - [ ] **DATA-04**: Primary split: image-level stratified train/val/test (70/15/15) with class-label stratification and fixed random seed
-- [ ] **DATA-05**: Secondary split: center holdout (Center 1 → train/val, Centers 2+3 → test) with stratified train/val within Center 1
+- [ ] **DATA-05**: Secondary split: center holdout (Center 1 -> train/val, Centers 2+3 -> test) with stratified train/val within Center 1
 - [ ] **DATA-06**: Split manifests saved as CSV files with image_id, split assignment, and label
 - [ ] **DATA-07**: Leakage risk explicitly documented in audit report and PoC report (no patient_id, same-lesion multi-angle images)
 
 ### Model Training
 
 - [ ] **TRAIN-01**: PyTorch dataset class loading images + labels from split manifests with configurable transforms
-- [ ] **TRAIN-02**: Augmentation pipeline: resize 224x224, ImageNet normalization, CLAHE (albumentations), horizontal flip, small rotation (±15°)
+- [ ] **TRAIN-02**: Augmentation pipeline: resize 224x224, ImageNet normalization, CLAHE (albumentations), horizontal flip, small rotation (+/-15 degrees)
 - [ ] **TRAIN-03**: EfficientNet-B0 backbone via timm with pretrained ImageNet weights, 3-class output head
 - [ ] **TRAIN-04**: Inverse-frequency weighted cross-entropy loss for class imbalance
 - [ ] **TRAIN-05**: Training script with configurable hyperparameters via YAML config (lr, batch_size, epochs, patience, backbone, loss_type)
@@ -47,17 +47,17 @@ Requirements for initial PoC release. Each maps to roadmap phases.
 
 ### Inference
 
-- [ ] **INFR-01**: Single-image inference script: image path + checkpoint → class prediction + softmax confidences + Grad-CAM overlay
+- [ ] **INFR-01**: Single-image inference script: image path + checkpoint -> class prediction + softmax confidences + Grad-CAM overlay
 - [ ] **INFR-02**: Batch inference mode for evaluating a directory of images
 
 ### Documentation
 
-- [ ] **DOCS-01**: `dataset_spec.md` — column definitions, label schema, data provenance, license (CC BY-NC-ND 4.0)
-- [ ] **DOCS-02**: `data_audit_report.md` — auto-generated from audit script with embedded figures
-- [ ] **DOCS-03**: `model_card.md` — architecture, training data, performance, limitations, ethical considerations
-- [ ] **DOCS-04**: `poc_report.md` — executive summary, methods, results (both splits), clinical relevance, limitations, next steps
-- [ ] **DOCS-05**: `README.md` — setup instructions, data download, train/eval/infer commands, project structure
-- [ ] **DOCS-06**: `requirements.txt` — pinned Python dependencies
+- [ ] **DOCS-01**: `dataset_spec.md` -- column definitions, label schema, data provenance, license (CC BY-NC-ND 4.0)
+- [ ] **DOCS-02**: `data_audit_report.md` -- auto-generated from audit script with embedded figures
+- [ ] **DOCS-03**: `model_card.md` -- architecture, training data, performance, limitations, ethical considerations
+- [ ] **DOCS-04**: `poc_report.md` -- executive summary, methods, results (both splits), clinical relevance, limitations, next steps
+- [ ] **DOCS-05**: `README.md` -- setup instructions, data download, train/eval/infer commands, project structure
+- [ ] **DOCS-06**: `requirements.txt` -- pinned Python dependencies
 
 ### Infrastructure
 
@@ -68,7 +68,7 @@ Requirements for initial PoC release. Each maps to roadmap phases.
 
 ### Demo (Optional)
 
-- [ ] **DEMO-01**: Streamlit app: upload image → prediction with confidence bars + Grad-CAM overlay + non-clinical-use disclaimer
+- [ ] **DEMO-01**: Streamlit app: upload image -> prediction with confidence bars + Grad-CAM overlay + non-clinical-use disclaimer
 
 ## v2 Requirements
 
@@ -100,7 +100,7 @@ Deferred to future work. Tracked but not in current roadmap.
 | Hyperparameter optimization / AutoML | PoC goal is feasibility, not squeezing marginal AUC gains. HPO on 3.7K images risks overfitting to val set |
 | Ensemble of multiple architectures | Complicates inference, explainability (whose Grad-CAM?), and reproducibility |
 | Custom loss functions (triplet, contrastive) | Exotic losses add complexity without proven benefit at PoC scale |
-| 9-subtype classification | Some subtypes have <50 samples — results would be statistically meaningless |
+| 9-subtype classification | Some subtypes have <50 samples -- results would be statistically meaningless |
 | DICOM handling / PACS integration | BTXRD provides JPEGs; DICOM pipeline adds zero benefit for this dataset |
 | Test-time augmentation | Complicates inference for marginal gains; note as future improvement |
 | Production deployment / serving | This is a PoC, not a service |
@@ -151,10 +151,10 @@ Deferred to future work. Tracked but not in current roadmap.
 | DEMO-01 | Phase 8 | Pending |
 
 **Coverage:**
-- v1 requirements: 35 total
-- Mapped to phases: 35
-- Unmapped: 0 ✓
+- v1 requirements: 39 total
+- Mapped to phases: 39
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-19*
-*Last updated: 2026-02-19 after initial definition*
+*Last updated: 2026-02-19 after roadmap creation*
