@@ -9,29 +9,30 @@ See: .planning/PROJECT.md (updated 2026-02-19)
 
 ## Current Position
 
-Phase: 1 of 8 (Scaffold and Infrastructure)
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-02-19 -- Completed 01-02-PLAN.md
+Phase: 2 of 8 (Data Acquisition and Audit)
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-02-19 -- Completed 02-01-PLAN.md
 
-Progress: [██░░░░░░░░░░░░░░] 2/16 (12%)
+Progress: [███░░░░░░░░░░░░░] 3/16 (19%)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
-- Average duration: 3.5 min
-- Total execution time: 7 min
+- Total plans completed: 3
+- Average duration: 6 min
+- Total execution time: 18 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01 Scaffold | 2/2 | 7 min | 3.5 min |
+| 02 Data Acquisition | 1/2 | 11 min | 11 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (3 min), 01-02 (4 min)
-- Trend: stable
+- Last 5 plans: 01-01 (3 min), 01-02 (4 min), 02-01 (11 min)
+- Trend: increased (download + network I/O)
 
 *Updated after each plan completion*
 
@@ -51,19 +52,22 @@ Recent decisions affecting current work:
 - [01-02]: CLI overrides via dot-notation with yaml.safe_load type coercion
 - [01-02]: torch.use_deterministic_algorithms(True, warn_only=True) for reproducibility
 - [01-02]: Standardized script template: shebang, docstring, PROJECT_ROOT, argparse, config+seed, NotImplementedError
+- [02-01]: Dataset ships as xlsx, converted to CSV during extraction (openpyxl added)
+- [02-01]: Column names use spaces (hip bone, simple bone cyst) and hyphens (ankle-joint), no underscores
+- [02-01]: Image filenames use .jpeg extension (IMG000001.jpeg), not .jpg
+- [02-01]: Nested Annotations/Annotations/ is a ZIP artifact, removed during extraction
 
 ### Pending Todos
 
-None yet.
+None.
 
 ### Blockers/Concerns
 
-- [Research]: PyTorch + torchvision version pairing must be verified against PyPI during Phase 1 setup
-- [Research]: BTXRD dataset.csv column names for proxy patient grouping must be confirmed after download in Phase 2
+- [Research]: BTXRD dataset.csv column names for proxy patient grouping -- RESOLVED: confirmed 37 columns with exact names after download
 - [Research]: timm EfficientNet-B0 Grad-CAM target layer name must be verified against installed version in Phase 6
 
 ## Session Continuity
 
-Last session: 2026-02-19T17:16Z
-Stopped at: Completed 01-02-PLAN.md — Phase 1 complete
+Last session: 2026-02-19T20:19Z
+Stopped at: Completed 02-01-PLAN.md
 Resume file: None
