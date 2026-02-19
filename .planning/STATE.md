@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-19)
 
 **Core value:** Deliver a reproducible, auditable 3-class bone tumor classification baseline with clear explainability outputs that a clinician can inspect and trust.
-**Current focus:** Phase 3 - Data Splitting and Dataset Loader
+**Current focus:** Phase 4 - Model and Training
 
 ## Current Position
 
-Phase: 3 of 8 (Splits and Dataset Loader)
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-02-19 -- Completed 03-01-PLAN.md
+Phase: 3 of 8 (Splits and Dataset Loader) -- COMPLETE
+Plan: 2 of 2 in current phase
+Status: Phase complete
+Last activity: 2026-02-19 -- Completed 03-02-PLAN.md
 
-Progress: [█████░░░░░░░░░░░] 5/16 (31%)
+Progress: [██████░░░░░░░░░░] 6/16 (38%)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
-- Average duration: 8 min
-- Total execution time: 40 min
+- Total plans completed: 6
+- Average duration: 7 min
+- Total execution time: 42 min
 
 **By Phase:**
 
@@ -29,11 +29,11 @@ Progress: [█████░░░░░░░░░░░] 5/16 (31%)
 |-------|-------|-------|----------|
 | 01 Scaffold | 2/2 | 7 min | 3.5 min |
 | 02 Data Acquisition | 2/2 | 18 min | 9 min |
-| 03 Splits & Loader | 1/2 | 15 min | 15 min |
+| 03 Splits & Loader | 2/2 | 17 min | 8.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (4 min), 02-01 (11 min), 02-02 (7 min), 03-01 (15 min)
-- Trend: 03-01 higher due to phash computation over 3746 images
+- Last 5 plans: 02-01 (11 min), 02-02 (7 min), 03-01 (15 min), 03-02 (2 min)
+- Trend: 03-02 fast -- straightforward implementation with no blockers
 
 *Updated after each plan completion*
 
@@ -66,6 +66,10 @@ Recent decisions affecting current work:
 - [03-01]: Center-holdout val_ratio=15% applied to Center 1 only (439 val images from 2938 Center 1 total)
 - [03-01]: phash hash_size=8 distance=0 for duplicate detection (21 pairs found, matches Phase 2 audit)
 - [03-01]: Split CSV format: image_id,split,label (3 columns, no index)
+- [03-02]: CLAHE p=1.0 (always applied) for radiograph contrast enhancement in training
+- [03-02]: get_test_transforms aliases get_val_transforms (identical deterministic pipeline)
+- [03-02]: Image.open().convert("RGB") handles both grayscale and color inputs uniformly
+- [03-02]: Dataset validates labels at init time (fail-fast on unknown labels)
 
 ### Pending Todos
 
@@ -79,6 +83,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-19T21:45Z
-Stopped at: Completed 03-01-PLAN.md
+Last session: 2026-02-20T17:31Z
+Stopped at: Completed 03-02-PLAN.md (Phase 3 complete)
 Resume file: None
