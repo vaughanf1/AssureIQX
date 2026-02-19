@@ -80,12 +80,12 @@ Plans:
   3. Checkpoints contain model weights, optimizer state, full config, class names, and normalization stats -- loading a checkpoint and running a forward pass produces valid 3-class softmax outputs
   4. Training logs (`results/{split_name}/training_log.csv`) record epoch, train_loss, val_loss, and val_metrics, and loss curve plots are saved as PNG files showing convergence
   5. Per-class training accuracy confirms the Malignant class is not collapsed (Malignant recall > 0 throughout training)
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 04-01: Model architecture and loss function
-- [ ] 04-02: Training loop, early stopping, and checkpoint management
-- [ ] 04-03: Train on both split strategies and verify convergence
+- [ ] 04-01-PLAN.md -- Model architecture (BTXRDClassifier), factory functions, class weights, device detection, early stopping
+- [ ] 04-02-PLAN.md -- Training script with full loop, validation, logging, loss curves, and Makefile train-all target
+- [ ] 04-03-PLAN.md -- Train on both split strategies (stratified + center-holdout) and verify convergence
 
 ### Phase 5: Evaluation
 **Goal**: Both trained models are comprehensively evaluated with clinically relevant metrics, producing a side-by-side comparison that reveals the generalization gap between stratified and center-holdout performance
