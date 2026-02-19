@@ -33,11 +33,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. `configs/default.yaml` contains all hyperparameters, paths, and seeds referenced in the architecture (lr, batch_size, epochs, patience, backbone, loss_type, split ratios, random seed)
   4. `make` with no target prints available Makefile targets (download, audit, split, train, evaluate, gradcam, infer, report, demo, all)
   5. `src/utils/reproducibility.py` sets deterministic seeds for random, numpy, torch, and torch.cuda when called
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 01-01: Project skeleton and dependency setup
-- [ ] 01-02: Configuration system, Makefile, and reproducibility utilities
+- [ ] 01-01-PLAN.md -- Project directory structure, .gitignore, requirements.txt, and README.md
+- [ ] 01-02-PLAN.md -- Configuration system, Makefile, reproducibility utilities, and placeholder scripts
 
 ### Phase 2: Data Acquisition and Audit
 **Goal**: The raw BTXRD dataset is downloaded, organized, profiled, and documented -- all data quality issues are surfaced before any modeling begins
@@ -154,7 +154,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Scaffold and Infrastructure | 0/2 | Not started | - |
+| 1. Scaffold and Infrastructure | 0/2 | Planned | - |
 | 2. Data Acquisition and Audit | 0/2 | Not started | - |
 | 3. Splits and Dataset Loader | 0/2 | Not started | - |
 | 4. Model Training | 0/3 | Not started | - |
