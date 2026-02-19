@@ -7,14 +7,18 @@ device: auto  # auto | cpu | cuda
 
 # ── Data ─────────────────────────────────────────────
 data:
-  raw_dir: data/raw
+  raw_dir: data_raw
   splits_dir: data/splits
   image_size: 224
   num_workers: 4
   train_split: 0.70
   val_split: 0.15
   test_split: 0.15
-  figshare_url: "https://figshare.com/ndownloader/articles/21899338/versions/1"
+  figshare_url: "https://ndownloader.figshare.com/files/50653575"
+  figshare_article_id: 27865398
+  figshare_file_id: 50653575
+  expected_md5: "59132a5036d030580ccade8add8f13df"
+  expected_image_count: 3746
 
 # ── Model ────────────────────────────────────────────
 model:

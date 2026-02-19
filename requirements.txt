@@ -36,3 +36,7 @@ seaborn==0.13.2
 # Utilities
 tqdm==4.67.1
 pyyaml==6.0.2
+
+# Download and audit
+requests>=2.31.0
+imagehash==4.3.2
