@@ -35,7 +35,10 @@ from src.utils.config import load_config
 from src.utils.logging import setup_logging
 from src.utils.reproducibility import set_seed
 
-logger = logging.getLogger(__name__)
+# Use the project-wide logger name so setup_logging handlers work.
+# Re-assigned in main() after setup_logging is called, but set a default
+# here so module-level functions can be imported and tested independently.
+logger = logging.getLogger("assurexray.download")
 
 
 def _count_jpegs(directory: Path) -> int:
@@ -149,7 +152,8 @@ def extract_and_organize(zip_path: Path, dest_dir: Path) -> None:
     """Extract ZIP and flatten a single top-level wrapper directory if present.
 
     After extraction, verifies the expected directory structure:
-    images/, Annotations/ (or annotations/), dataset.csv.
+    images/, Annotations/ (or annotations/), and dataset.csv (converted
+    from dataset.xlsx if the ZIP ships Excel format).
 
     Parameters
     ----------
@@ -158,6 +162,8 @@ def extract_and_organize(zip_path: Path, dest_dir: Path) -> None:
     dest_dir : Path
         Destination directory for extracted contents.
     """
+    import pandas as pd
+
     logger.info("Extracting %s -> %s", zip_path, dest_dir)
 
     with zipfile.ZipFile(zip_path, "r") as zf:
@@ -181,7 +187,50 @@ def extract_and_organize(zip_path: Path, dest_dir: Path) -> None:
                 shutil.move(str(item), str(target))
             wrapper.rmdir()
 
+    # ------------------------------------------------------------------
+    # Clean up: remove Excel temp files (e.g., ~$dataset(total).xlsx)
+    # ------------------------------------------------------------------
+    for tmp_file in dest_dir.glob("~$*"):
+        logger.info("Removing temp file: %s", tmp_file.name)
+        tmp_file.unlink()
+
+    # ------------------------------------------------------------------
+    # Convert dataset.xlsx -> dataset.csv if the ZIP ships Excel format
+    # ------------------------------------------------------------------
+    csv_path = dest_dir / "dataset.csv"
+    xlsx_path = dest_dir / "dataset.xlsx"
+    if xlsx_path.is_file() and not csv_path.is_file():
+        logger.info(
+            "Converting dataset.xlsx -> dataset.csv (ZIP ships Excel format)"
+        )
+        df = pd.read_excel(xlsx_path)
+        df.to_csv(csv_path, index=False)
+        xlsx_path.unlink()
+        logger.info(
+            "Converted: %d rows x %d columns written to dataset.csv",
+            len(df),
+            len(df.columns),
+        )
+
+    # ------------------------------------------------------------------
+    # Clean up nested Annotations/Annotations/ if present
+    # ------------------------------------------------------------------
+    annot_dir = dest_dir / "Annotations"
+    if not annot_dir.is_dir():
+        annot_dir = dest_dir / "annotations"
+    if annot_dir.is_dir():
+        nested = annot_dir / "Annotations"
+        if not nested.is_dir():
+            nested = annot_dir / "annotations"
+        if nested.is_dir():
+            logger.info(
+                "Removing nested annotations directory: %s", nested.name
+            )
+            shutil.rmtree(nested)
+
+    # ------------------------------------------------------------------
     # Verify expected structure (case-insensitive checks)
+    # ------------------------------------------------------------------
     images_dir = dest_dir / "images"
     if not images_dir.is_dir():
         images_dir = dest_dir / "Images"
@@ -200,7 +249,6 @@ def extract_and_organize(zip_path: Path, dest_dir: Path) -> None:
             f"Contents: {[p.name for p in dest_dir.iterdir()]}"
         )
 
-    csv_path = dest_dir / "dataset.csv"
     if not csv_path.is_file():
         raise FileNotFoundError(
             f"Expected dataset.csv not found in {dest_dir}. "
@@ -210,8 +258,6 @@ def extract_and_organize(zip_path: Path, dest_dir: Path) -> None:
     # Print counts
     n_images = _count_jpegs(images_dir)
     n_annotations = _count_jsons(annot_dir)
-
-    import pandas as pd
 
     df = pd.read_csv(csv_path)
     n_rows = len(df)
@@ -258,9 +304,22 @@ def main() -> None:
         logger.info("Data already exists at %s. Skipping download.", raw_dir)
         return
 
-    # Download
+    # Download (skip if ZIP already present and MD5 matches)
     zip_path = raw_dir / "BTXRD.zip"
-    download_with_verification(figshare_url, zip_path, expected_md5)
+    if zip_path.is_file():
+        logger.info("ZIP already exists at %s, verifying MD5...", zip_path)
+        md5_hash = hashlib.md5()
+        with open(zip_path, "rb") as f:
+            for chunk in iter(lambda: f.read(8192), b""):
+                md5_hash.update(chunk)
+        if md5_hash.hexdigest() != expected_md5:
+            logger.warning("Existing ZIP has wrong MD5, re-downloading...")
+            zip_path.unlink()
+            download_with_verification(figshare_url, zip_path, expected_md5)
+        else:
+            logger.info("Existing ZIP MD5 verified: %s", md5_hash.hexdigest())
+    else:
+        download_with_verification(figshare_url, zip_path, expected_md5)
 
     # Extract and organize
     extract_and_organize(zip_path, raw_dir)
