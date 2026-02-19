@@ -11,6 +11,9 @@ data:
   splits_dir: data/splits
   image_size: 224
   num_workers: 4
+  train_split: 0.70
+  val_split: 0.15
+  test_split: 0.15
   figshare_url: "https://figshare.com/ndownloader/articles/21899338/versions/1"
 
 # ── Model ────────────────────────────────────────────
