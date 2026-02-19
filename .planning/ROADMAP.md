@@ -48,11 +48,11 @@ Plans:
   2. Running `make audit` (or `python scripts/audit.py`) generates `docs/data_audit_report.md` with embedded figures showing class distribution (confirming 1,879 / 1,525 / 342), image dimension histogram, per-center breakdown, missing value counts, annotation coverage, and duplicate detection results
   3. `docs/dataset_spec.md` documents all 37 columns of `dataset.csv`, the label derivation logic (malignant=1 then Malignant, benign=1 then Benign, tumor=0 then Normal), data provenance per center, and the CC BY-NC-ND 4.0 license
   4. The audit report explicitly documents the leakage risk from same-lesion multi-angle images (no patient_id) and notes which metadata columns are available for proxy patient grouping
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 02-01: Download script and data organization
-- [ ] 02-02: Data audit script and dataset specification document
+- [ ] 02-01-PLAN.md -- Download script, config fix, dependency update, and data verification
+- [ ] 02-02-PLAN.md -- Data audit script with report generation and dataset specification document
 
 ### Phase 3: Splits and Dataset Loader
 **Goal**: Data is split into reproducible train/val/test sets using two strategies, and a PyTorch dataset class loads images with the correct augmentation pipeline for each mode (train/val/test)
