@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-02-19)
 
 ## Current Position
 
-Phase: 3 of 8 (Splits and Dataset Loader) -- COMPLETE
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-02-19 -- Completed 03-02-PLAN.md
+Phase: 4 of 8 (Model Training) -- In progress
+Plan: 1 of 3 in current phase
+Status: In progress
+Last activity: 2026-02-19 -- Completed 04-01-PLAN.md
 
-Progress: [██████░░░░░░░░░░] 6/16 (38%)
+Progress: [███████░░░░░░░░░] 7/16 (44%)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: 7 min
-- Total execution time: 42 min
+- Total plans completed: 7
+- Average duration: 6.3 min
+- Total execution time: 44 min
 
 **By Phase:**
 
@@ -30,10 +30,11 @@ Progress: [██████░░░░░░░░░░] 6/16 (38%)
 | 01 Scaffold | 2/2 | 7 min | 3.5 min |
 | 02 Data Acquisition | 2/2 | 18 min | 9 min |
 | 03 Splits & Loader | 2/2 | 17 min | 8.5 min |
+| 04 Model Training | 1/3 | 2 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (11 min), 02-02 (7 min), 03-01 (15 min), 03-02 (2 min)
-- Trend: 03-02 fast -- straightforward implementation with no blockers
+- Last 5 plans: 02-02 (7 min), 03-01 (15 min), 03-02 (2 min), 04-01 (2 min)
+- Trend: 04-01 fast -- clean implementation from well-researched patterns
 
 *Updated after each plan completion*
 
@@ -70,6 +71,10 @@ Recent decisions affecting current work:
 - [03-02]: get_test_transforms aliases get_val_transforms (identical deterministic pipeline)
 - [03-02]: Image.open().convert("RGB") handles both grayscale and color inputs uniformly
 - [03-02]: Dataset validates labels at init time (fail-fast on unknown labels)
+- [04-01]: gradcam_target_layer returns model.bn2 (BatchNormAct2d 1280) -- verified for Phase 6
+- [04-01]: save_checkpoint includes class_weights as list for checkpoint self-documentation
+- [04-01]: compute_class_weights returns CPU tensor -- caller responsible for .to(device)
+- [04-01]: Full fine-tuning (no frozen layers) as recommended for small dataset transfer learning
 
 ### Pending Todos
 
@@ -83,6 +88,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-20T17:31Z
-Stopped at: Completed 03-02-PLAN.md (Phase 3 complete)
+Last session: 2026-02-19T23:23Z
+Stopped at: Completed 04-01-PLAN.md
 Resume file: None
