@@ -9,9 +9,9 @@ Requirements for initial PoC release. Each maps to roadmap phases.
 
 ### Data Pipeline
 
-- [ ] **DATA-01**: Download script fetches BTXRD dataset from figshare and organizes into `data_raw/` (images/, annotations/, dataset.csv)
-- [ ] **DATA-02**: Data audit report covering class distribution, image dimension histogram, missing values, annotation coverage, duplicate detection, per-center breakdown
-- [ ] **DATA-03**: Dataset specification document describing all 37 columns, label derivation logic (malignant=1 -> Malignant, benign=1 -> Benign, tumor=0 -> Normal), and data provenance
+- [x] **DATA-01**: Download script fetches BTXRD dataset from figshare and organizes into `data_raw/` (images/, annotations/, dataset.csv)
+- [x] **DATA-02**: Data audit report covering class distribution, image dimension histogram, missing values, annotation coverage, duplicate detection, per-center breakdown
+- [x] **DATA-03**: Dataset specification document describing all 37 columns, label derivation logic (malignant=1 -> Malignant, benign=1 -> Benign, tumor=0 -> Normal), and data provenance
 - [ ] **DATA-04**: Primary split: image-level stratified train/val/test (70/15/15) with class-label stratification and fixed random seed
 - [ ] **DATA-05**: Secondary split: center holdout (Center 1 -> train/val, Centers 2+3 -> test) with stratified train/val within Center 1
 - [ ] **DATA-06**: Split manifests saved as CSV files with image_id, split assignment, and label
@@ -52,8 +52,8 @@ Requirements for initial PoC release. Each maps to roadmap phases.
 
 ### Documentation
 
-- [ ] **DOCS-01**: `dataset_spec.md` -- column definitions, label schema, data provenance, license (CC BY-NC-ND 4.0)
-- [ ] **DOCS-02**: `data_audit_report.md` -- auto-generated from audit script with embedded figures
+- [x] **DOCS-01**: `dataset_spec.md` -- column definitions, label schema, data provenance, license (CC BY-NC-ND 4.0)
+- [x] **DOCS-02**: `data_audit_report.md` -- auto-generated from audit script with embedded figures
 - [ ] **DOCS-03**: `model_card.md` -- architecture, training data, performance, limitations, ethical considerations
 - [ ] **DOCS-04**: `poc_report.md` -- executive summary, methods, results (both splits), clinical relevance, limitations, next steps
 - [ ] **DOCS-05**: `README.md` -- setup instructions, data download, train/eval/infer commands, project structure
@@ -116,11 +116,11 @@ Deferred to future work. Tracked but not in current roadmap.
 | INFRA-04 | Phase 1 | Complete |
 | DOCS-05 | Phase 1 | Complete |
 | DOCS-06 | Phase 1 | Complete |
-| DATA-01 | Phase 2 | Pending |
-| DATA-02 | Phase 2 | Pending |
-| DATA-03 | Phase 2 | Pending |
-| DOCS-01 | Phase 2 | Pending |
-| DOCS-02 | Phase 2 | Pending |
+| DATA-01 | Phase 2 | Complete |
+| DATA-02 | Phase 2 | Complete |
+| DATA-03 | Phase 2 | Complete |
+| DOCS-01 | Phase 2 | Complete |
+| DOCS-02 | Phase 2 | Complete |
 | DATA-04 | Phase 3 | Pending |
 | DATA-05 | Phase 3 | Pending |
 | DATA-06 | Phase 3 | Pending |
@@ -157,4 +157,4 @@ Deferred to future work. Tracked but not in current roadmap.
 
 ---
 *Requirements defined: 2026-02-19*
-*Last updated: 2026-02-19 after Phase 1 completion*
+*Last updated: 2026-02-19 after Phase 2 completion*
