@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-19)
 ## Current Position
 
 Phase: 4 of 8 (Model Training) -- In progress
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2026-02-19 -- Completed 04-01-PLAN.md
+Last activity: 2026-02-20 -- Completed 04-02-PLAN.md
 
-Progress: [███████░░░░░░░░░] 7/16 (44%)
+Progress: [████████░░░░░░░░] 8/16 (50%)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
-- Average duration: 6.3 min
-- Total execution time: 44 min
+- Total plans completed: 8
+- Average duration: 5.9 min
+- Total execution time: 47 min
 
 **By Phase:**
 
@@ -30,11 +30,11 @@ Progress: [███████░░░░░░░░░] 7/16 (44%)
 | 01 Scaffold | 2/2 | 7 min | 3.5 min |
 | 02 Data Acquisition | 2/2 | 18 min | 9 min |
 | 03 Splits & Loader | 2/2 | 17 min | 8.5 min |
-| 04 Model Training | 1/3 | 2 min | 2 min |
+| 04 Model Training | 2/3 | 5 min | 2.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-02 (7 min), 03-01 (15 min), 03-02 (2 min), 04-01 (2 min)
-- Trend: 04-01 fast -- clean implementation from well-researched patterns
+- Last 5 plans: 03-01 (15 min), 03-02 (2 min), 04-01 (2 min), 04-02 (3 min)
+- Trend: Consistent fast execution on well-planned model training tasks
 
 *Updated after each plan completion*
 
@@ -75,6 +75,9 @@ Recent decisions affecting current work:
 - [04-01]: save_checkpoint includes class_weights as list for checkpoint self-documentation
 - [04-01]: compute_class_weights returns CPU tensor -- caller responsible for .to(device)
 - [04-01]: Full fine-tuning (no frozen layers) as recommended for small dataset transfer learning
+- [04-02]: Weighted CrossEntropyLoss for training only; unweighted for val/early stopping -- prevents class weight from distorting stopping signal
+- [04-02]: Split-prefixed checkpoint names (best_stratified.pt, best_center.pt) -- avoids overwriting when running both splits
+- [04-02]: Results directory naming: stratified/ and center_holdout/ -- matches Phase 3 convention
 
 ### Pending Todos
 
@@ -88,6 +91,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-19T23:23Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-02-20T00:15Z
+Stopped at: Completed 04-02-PLAN.md
 Resume file: None
