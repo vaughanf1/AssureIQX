@@ -100,7 +100,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 05-01-PLAN.md -- Core metrics computation (ROC, PR, confusion matrix, sensitivity/specificity) and visualization pipeline with eval.py orchestration
+- [x] 05-01-PLAN.md -- Core metrics computation (ROC, PR, confusion matrix, sensitivity/specificity) and visualization pipeline with eval.py orchestration
 - [ ] 05-02-PLAN.md -- Bootstrap confidence intervals, dual-split comparison table, and BTXRD baseline comparison
 
 ### Phase 6: Explainability and Inference
@@ -158,7 +158,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 2. Data Acquisition and Audit | 2/2 | Complete | 2026-02-19 |
 | 3. Splits and Dataset Loader | 2/2 | Complete | 2026-02-20 |
 | 4. Model Training | 3/3 | Complete | 2026-02-20 |
-| 5. Evaluation | 0/2 | Not started | - |
+| 5. Evaluation | 1/2 | In progress | - |
 | 6. Explainability and Inference | 0/2 | Not started | - |
 | 7. Documentation and Reports | 0/2 | Not started | - |
 | 8. Streamlit Demo (Optional) | 0/1 | Not started | - |

@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-19)
 
 **Core value:** Deliver a reproducible, auditable 3-class bone tumor classification baseline with clear explainability outputs that a clinician can inspect and trust.
-**Current focus:** Phase 4 - Model and Training
+**Current focus:** Phase 5 - Evaluation
 
 ## Current Position
 
-Phase: 4 of 8 (Model Training) -- In progress
-Plan: 2 of 3 in current phase
+Phase: 5 of 8 (Evaluation) -- In progress
+Plan: 1 of 2 in current phase
 Status: In progress
-Last activity: 2026-02-20 -- Completed 04-02-PLAN.md
+Last activity: 2026-02-20 -- Completed 05-01-PLAN.md
 
-Progress: [████████░░░░░░░░] 8/16 (50%)
+Progress: [█████████░░░░░░░] 10/16 (62%)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
-- Average duration: 5.9 min
-- Total execution time: 47 min
+- Total plans completed: 10
+- Average duration: 5.7 min
+- Total execution time: 57 min
 
 **By Phase:**
 
@@ -30,11 +30,12 @@ Progress: [████████░░░░░░░░] 8/16 (50%)
 | 01 Scaffold | 2/2 | 7 min | 3.5 min |
 | 02 Data Acquisition | 2/2 | 18 min | 9 min |
 | 03 Splits & Loader | 2/2 | 17 min | 8.5 min |
-| 04 Model Training | 2/3 | 5 min | 2.5 min |
+| 04 Model Training | 3/3 | 5 min | 1.7 min |
+| 05 Evaluation | 1/2 | 10 min | 10 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-01 (15 min), 03-02 (2 min), 04-01 (2 min), 04-02 (3 min)
-- Trend: Consistent fast execution on well-planned model training tasks
+- Last 5 plans: 03-02 (2 min), 04-01 (2 min), 04-02 (3 min), 04-03 (n/a), 05-01 (10 min)
+- Trend: Evaluation plan longer due to model inference on 1372 test images across 2 splits
 
 *Updated after each plan completion*
 
@@ -78,6 +79,9 @@ Recent decisions affecting current work:
 - [04-02]: Weighted CrossEntropyLoss for training only; unweighted for val/early stopping -- prevents class weight from distorting stopping signal
 - [04-02]: Split-prefixed checkpoint names (best_stratified.pt, best_center.pt) -- avoids overwriting when running both splits
 - [04-02]: Results directory naming: stratified/ and center_holdout/ -- matches Phase 3 convention
+- [05-01]: Softmax applied exactly once in run_inference; model outputs raw logits
+- [05-01]: One-vs-Rest strategy for ROC and PR curves via label_binarize
+- [05-01]: Malignant sensitivity logged as headline metric over overall accuracy
 
 ### Pending Todos
 
@@ -88,9 +92,10 @@ None.
 - [Research]: timm EfficientNet-B0 Grad-CAM target layer name must be verified against installed version in Phase 6
 - [03-01]: Center 3 has only 27 Normal images in center-holdout test set -- model evaluation should note this imbalance
 - [03-01]: Same-lesion multi-angle image leakage risk documented but NOT mitigated (no patient_id available)
+- [05-01]: Center-holdout generalization gap is substantial (macro AUC 0.627 vs 0.846 stratified) -- expected but important for Phase 7 reporting
 
 ## Session Continuity
 
-Last session: 2026-02-20T00:15Z
-Stopped at: Completed 04-02-PLAN.md
+Last session: 2026-02-20T16:05Z
+Stopped at: Completed 05-01-PLAN.md
 Resume file: None
