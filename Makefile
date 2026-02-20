@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 
-.PHONY: help download audit split train evaluate gradcam infer report demo all
+.PHONY: help download audit split train train-all evaluate gradcam infer report demo all
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -17,6 +17,10 @@ split: ## Generate train/val/test split manifests
 
 train: ## Train EfficientNet-B0 classifier on BTXRD dataset
 	python scripts/train.py --config configs/default.yaml
+
+train-all: ## Train on both stratified and center-holdout splits
+	python scripts/train.py --config configs/default.yaml --override training.split_strategy=stratified
+	python scripts/train.py --config configs/default.yaml --override training.split_strategy=center
 
 evaluate: ## Evaluate trained model on both split strategies
 	python scripts/eval.py --config configs/default.yaml
