@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-19)
 
 **Core value:** Deliver a reproducible, auditable 3-class bone tumor classification baseline with clear explainability outputs that a clinician can inspect and trust.
-**Current focus:** Phase 6 - Explainability and Inference (In Progress)
+**Current focus:** Phase 6 - Explainability and Inference (Complete)
 
 ## Current Position
 
-Phase: 6 of 8 (Explainability and Inference) -- In Progress
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-02-20 -- Completed 06-01-PLAN.md
+Phase: 6 of 8 (Explainability and Inference) -- Complete
+Plan: 2 of 2 in current phase
+Status: Phase complete
+Last activity: 2026-02-20 -- Completed 06-02-PLAN.md
 
-Progress: [████████████░░░░] 12/16 (75%)
+Progress: [█████████████░░░] 13/16 (81%)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12
-- Average duration: 5.6 min
-- Total execution time: 73 min
+- Total plans completed: 13
+- Average duration: 5.5 min
+- Total execution time: 76 min
 
 **By Phase:**
 
@@ -32,11 +32,11 @@ Progress: [████████████░░░░] 12/16 (75%)
 | 03 Splits & Loader | 2/2 | 17 min | 8.5 min |
 | 04 Model Training | 3/3 | 5 min | 1.7 min |
 | 05 Evaluation | 2/2 | 24 min | 12 min |
-| 06 Explainability | 1/2 | 2 min | 2 min |
+| 06 Explainability | 2/2 | 5 min | 2.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-02 (3 min), 04-03 (n/a), 05-01 (10 min), 05-02 (14 min), 06-01 (2 min)
-- Trend: Grad-CAM gallery fast due to reuse of inference patterns from Phase 5
+- Last 5 plans: 04-03 (n/a), 05-01 (10 min), 05-02 (14 min), 06-01 (2 min), 06-02 (3 min)
+- Trend: Phase 6 fast due to reuse of inference and Grad-CAM patterns from Phases 4-5
 
 *Updated after each plan completion*
 
@@ -90,6 +90,9 @@ Recent decisions affecting current work:
 - [06-01]: IoU threshold 0.5 for Grad-CAM binarization (standard in literature)
 - [06-01]: Stratified checkpoint for gallery (better performance = more interpretable heatmaps)
 - [06-01]: Mean IoU 0.070 between Grad-CAM and annotations -- model attention weakly aligned with tumor regions
+- [06-02]: Grad-CAM targets predicted class at inference (ground truth unavailable)
+- [06-02]: Class names loaded from checkpoint metadata for portability
+- [06-02]: PIL.Image.fromarray for overlay saving (avoids BGR/RGB cv2 confusion)
 
 ### Pending Todos
 
@@ -105,6 +108,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-20T17:50Z
-Stopped at: Completed 06-01-PLAN.md
+Last session: 2026-02-20T19:00Z
+Stopped at: Completed 06-02-PLAN.md (Phase 6 complete)
 Resume file: None
