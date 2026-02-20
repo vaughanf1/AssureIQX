@@ -113,11 +113,11 @@ Plans:
   3. A qualitative comparison of Grad-CAM attention regions against LabelMe tumor annotations is produced and documented (does the model attend to the annotated tumor region?)
   4. Running `python scripts/infer.py --image path/to/image.jpg --checkpoint path/to/best.pt` outputs class prediction, softmax confidence scores, and a Grad-CAM overlay PNG
   5. Batch inference mode (`python scripts/infer.py --input-dir path/to/images/`) processes a directory of images and outputs predictions for each
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 06-01: Grad-CAM generation and curated gallery
-- [ ] 06-02: Single-image and batch inference scripts
+- [ ] 06-01-PLAN.md -- Grad-CAM utility module and curated TP/FP/FN gallery with annotation comparison
+- [ ] 06-02-PLAN.md -- Single-image and batch inference scripts with Grad-CAM overlay
 
 ### Phase 7: Documentation and Reports
 **Goal**: The PoC is fully documented with a model card, a comprehensive PoC report, and a README that enables clean-room reproduction -- documentation is the deliverable
