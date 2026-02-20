@@ -128,11 +128,11 @@ Plans:
   2. `docs/poc_report.md` contains: executive summary, methods (data, splits, model, training), results (both splits with comparison table), Grad-CAM findings, explicit limitations section (leakage risk, label noise ceiling, center generalization gap, absence of pathology-confirmed labels), clinical relevance framing, and recommended next steps
   3. The PoC report includes a clinical decision framing statement (e.g., "at X% specificity, the model achieves Y% sensitivity for malignant tumors")
   4. `README.md` is updated with complete setup instructions, data download commands, train/eval/infer CLI commands, and project structure -- a new developer can reproduce results from scratch
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 07-01: Model card and PoC report
-- [ ] 07-02: README finalization and end-to-end reproduction verification
+- [ ] 07-01-PLAN.md -- Model card (Mitchell et al. 2019 format) and comprehensive PoC report with clinical framing
+- [ ] 07-02-PLAN.md -- README finalization with complete reproduction guide and Makefile updates
 
 ### Phase 8: Streamlit Demo (Optional)
 **Goal**: A non-technical user can upload a radiograph image and see a prediction with confidence bars and Grad-CAM overlay in a browser, with a clear disclaimer that this is not for clinical use
