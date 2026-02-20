@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-19)
 
 **Core value:** Deliver a reproducible, auditable 3-class bone tumor classification baseline with clear explainability outputs that a clinician can inspect and trust.
-**Current focus:** Phase 5 - Evaluation (COMPLETE)
+**Current focus:** Phase 6 - Explainability and Inference (In Progress)
 
 ## Current Position
 
-Phase: 5 of 8 (Evaluation) -- Complete
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-02-20 -- Completed 05-02-PLAN.md
+Phase: 6 of 8 (Explainability and Inference) -- In Progress
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-02-20 -- Completed 06-01-PLAN.md
 
-Progress: [███████████░░░░░] 11/16 (68%)
+Progress: [████████████░░░░] 12/16 (75%)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11
-- Average duration: 5.9 min
-- Total execution time: 71 min
+- Total plans completed: 12
+- Average duration: 5.6 min
+- Total execution time: 73 min
 
 **By Phase:**
 
@@ -32,10 +32,11 @@ Progress: [███████████░░░░░] 11/16 (68%)
 | 03 Splits & Loader | 2/2 | 17 min | 8.5 min |
 | 04 Model Training | 3/3 | 5 min | 1.7 min |
 | 05 Evaluation | 2/2 | 24 min | 12 min |
+| 06 Explainability | 1/2 | 2 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-01 (2 min), 04-02 (3 min), 04-03 (n/a), 05-01 (10 min), 05-02 (14 min)
-- Trend: Evaluation plans longer due to model inference on 1372 test images + 2000 bootstrap iterations
+- Last 5 plans: 04-02 (3 min), 04-03 (n/a), 05-01 (10 min), 05-02 (14 min), 06-01 (2 min)
+- Trend: Grad-CAM gallery fast due to reuse of inference patterns from Phase 5
 
 *Updated after each plan completion*
 
@@ -85,6 +86,10 @@ Recent decisions affecting current work:
 - [05-02]: Percentile method for bootstrap CIs with class-presence guard (critical for 51 Malignant samples)
 - [05-02]: 7 caveats for BTXRD baseline comparison (mAP vs AUC, random split, different architecture/size)
 - [05-02]: Generalization gap as center_holdout minus stratified (negative = worse)
+- [06-01]: Target predicted class for Grad-CAM (shows model's actual decision rationale)
+- [06-01]: IoU threshold 0.5 for Grad-CAM binarization (standard in literature)
+- [06-01]: Stratified checkpoint for gallery (better performance = more interpretable heatmaps)
+- [06-01]: Mean IoU 0.070 between Grad-CAM and annotations -- model attention weakly aligned with tumor regions
 
 ### Pending Todos
 
@@ -92,14 +97,14 @@ None.
 
 ### Blockers/Concerns
 
-- [Research]: timm EfficientNet-B0 Grad-CAM target layer name must be verified against installed version in Phase 6
 - [03-01]: Center 3 has only 27 Normal images in center-holdout test set -- model evaluation should note this imbalance
 - [03-01]: Same-lesion multi-angle image leakage risk documented but NOT mitigated (no patient_id available)
 - [05-01]: Center-holdout generalization gap is substantial (macro AUC 0.627 vs 0.846 stratified) -- expected but important for Phase 7 reporting
 - [05-02]: Malignant sensitivity CI width is 27 percentage points (0.474-0.743) due to only 51 test samples -- Phase 7 must flag this as a key limitation
+- [06-01]: Low Grad-CAM IoU (mean 0.070) suggests model attention not strongly correlated with expert tumor annotations -- important limitation for Phase 7 reporting
 
 ## Session Continuity
 
-Last session: 2026-02-20T16:22Z
-Stopped at: Completed 05-02-PLAN.md (Phase 5 complete)
+Last session: 2026-02-20T17:50Z
+Stopped at: Completed 06-01-PLAN.md
 Resume file: None
