@@ -21,23 +21,23 @@ Requirements for initial PoC release. Each maps to roadmap phases.
 
 - [x] **TRAIN-01**: PyTorch dataset class loading images + labels from split manifests with configurable transforms
 - [x] **TRAIN-02**: Augmentation pipeline: resize 224x224, ImageNet normalization, CLAHE (albumentations), horizontal flip, small rotation (+/-15 degrees)
-- [ ] **TRAIN-03**: EfficientNet-B0 backbone via timm with pretrained ImageNet weights, 3-class output head
-- [ ] **TRAIN-04**: Inverse-frequency weighted cross-entropy loss for class imbalance
-- [ ] **TRAIN-05**: Training script with configurable hyperparameters via YAML config (lr, batch_size, epochs, patience, backbone, loss_type)
-- [ ] **TRAIN-06**: Early stopping on validation loss with configurable patience
-- [ ] **TRAIN-07**: Checkpoint saving: best model (by val_loss) and final model
-- [ ] **TRAIN-08**: Training log CSV (epoch, train_loss, val_loss, val_metrics) and loss curve plot
+- [x] **TRAIN-03**: EfficientNet-B0 backbone via timm with pretrained ImageNet weights, 3-class output head
+- [x] **TRAIN-04**: Inverse-frequency weighted cross-entropy loss for class imbalance
+- [x] **TRAIN-05**: Training script with configurable hyperparameters via YAML config (lr, batch_size, epochs, patience, backbone, loss_type)
+- [x] **TRAIN-06**: Early stopping on validation loss with configurable patience
+- [x] **TRAIN-07**: Checkpoint saving: best model (by val_loss) and final model
+- [x] **TRAIN-08**: Training log CSV (epoch, train_loss, val_loss, val_metrics) and loss curve plot
 
 ### Evaluation
 
-- [ ] **EVAL-01**: ROC AUC (one-vs-rest per-class + macro) with plotted ROC curves
-- [ ] **EVAL-02**: PR AUC (per-class) with plotted precision-recall curves
-- [ ] **EVAL-03**: Per-class sensitivity (recall) and specificity from confusion matrix
-- [ ] **EVAL-04**: Confusion matrix heatmap (absolute counts + row-normalized)
-- [ ] **EVAL-05**: Classification report (precision, recall, F1 per class)
-- [ ] **EVAL-06**: Evaluation on both split strategies with comparison table
-- [ ] **EVAL-07**: Bootstrap 95% confidence intervals on AUC and per-class sensitivity (1000 iterations)
-- [ ] **EVAL-08**: Comparison table against BTXRD paper's YOLOv8s-cls baseline results
+- [x] **EVAL-01**: ROC AUC (one-vs-rest per-class + macro) with plotted ROC curves
+- [x] **EVAL-02**: PR AUC (per-class) with plotted precision-recall curves
+- [x] **EVAL-03**: Per-class sensitivity (recall) and specificity from confusion matrix
+- [x] **EVAL-04**: Confusion matrix heatmap (absolute counts + row-normalized)
+- [x] **EVAL-05**: Classification report (precision, recall, F1 per class)
+- [x] **EVAL-06**: Evaluation on both split strategies with comparison table
+- [x] **EVAL-07**: Bootstrap 95% confidence intervals on AUC and per-class sensitivity (1000 iterations)
+- [x] **EVAL-08**: Comparison table against BTXRD paper's YOLOv8s-cls baseline results
 
 ### Explainability
 
@@ -127,20 +127,20 @@ Deferred to future work. Tracked but not in current roadmap.
 | DATA-07 | Phase 3 | Complete |
 | TRAIN-01 | Phase 3 | Complete |
 | TRAIN-02 | Phase 3 | Complete |
-| TRAIN-03 | Phase 4 | Pending |
-| TRAIN-04 | Phase 4 | Pending |
-| TRAIN-05 | Phase 4 | Pending |
-| TRAIN-06 | Phase 4 | Pending |
-| TRAIN-07 | Phase 4 | Pending |
-| TRAIN-08 | Phase 4 | Pending |
-| EVAL-01 | Phase 5 | Pending |
-| EVAL-02 | Phase 5 | Pending |
-| EVAL-03 | Phase 5 | Pending |
-| EVAL-04 | Phase 5 | Pending |
-| EVAL-05 | Phase 5 | Pending |
-| EVAL-06 | Phase 5 | Pending |
-| EVAL-07 | Phase 5 | Pending |
-| EVAL-08 | Phase 5 | Pending |
+| TRAIN-03 | Phase 4 | Complete |
+| TRAIN-04 | Phase 4 | Complete |
+| TRAIN-05 | Phase 4 | Complete |
+| TRAIN-06 | Phase 4 | Complete |
+| TRAIN-07 | Phase 4 | Complete |
+| TRAIN-08 | Phase 4 | Complete |
+| EVAL-01 | Phase 5 | Complete |
+| EVAL-02 | Phase 5 | Complete |
+| EVAL-03 | Phase 5 | Complete |
+| EVAL-04 | Phase 5 | Complete |
+| EVAL-05 | Phase 5 | Complete |
+| EVAL-06 | Phase 5 | Complete |
+| EVAL-07 | Phase 5 | Complete |
+| EVAL-08 | Phase 5 | Complete |
 | EXPL-01 | Phase 6 | Pending |
 | EXPL-02 | Phase 6 | Pending |
 | EXPL-03 | Phase 6 | Pending |
@@ -157,4 +157,4 @@ Deferred to future work. Tracked but not in current roadmap.
 
 ---
 *Requirements defined: 2026-02-19*
-*Last updated: 2026-02-20 after Phase 3 completion*
+*Last updated: 2026-02-20 after Phase 5 completion*
