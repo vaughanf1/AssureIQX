@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Data Acquisition and Audit** - Download BTXRD, profile the dataset, produce audit and spec documents
 - [x] **Phase 3: Splits and Dataset Loader** - Dual split strategy, split manifests, PyTorch dataset class, augmentation pipeline
 - [x] **Phase 4: Model Training** - EfficientNet-B0 classifier, weighted loss, training loop with early stopping and checkpoints
-- [ ] **Phase 5: Evaluation** - Full metric suite on both splits, bootstrap CIs, comparison against paper baseline
+- [x] **Phase 5: Evaluation** - Full metric suite on both splits, bootstrap CIs, comparison against paper baseline
 - [ ] **Phase 6: Explainability and Inference** - Grad-CAM heatmaps, curated gallery, annotation comparison, single-image and batch inference
 - [ ] **Phase 7: Documentation and Reports** - Model card, PoC report with clinical framing and limitations
 - [ ] **Phase 8: Streamlit Demo (Optional)** - Interactive image upload with prediction and Grad-CAM overlay
@@ -101,7 +101,7 @@ Plans:
 
 Plans:
 - [x] 05-01-PLAN.md -- Core metrics computation (ROC, PR, confusion matrix, sensitivity/specificity) and visualization pipeline with eval.py orchestration
-- [ ] 05-02-PLAN.md -- Bootstrap confidence intervals, dual-split comparison table, and BTXRD baseline comparison
+- [x] 05-02-PLAN.md -- Bootstrap confidence intervals, dual-split comparison table, and BTXRD baseline comparison
 
 ### Phase 6: Explainability and Inference
 **Goal**: Clinicians can inspect Grad-CAM heatmaps showing where the model attends for each prediction, and a CLI tool produces predictions with confidence scores and visual overlays for any input image
@@ -158,7 +158,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 2. Data Acquisition and Audit | 2/2 | Complete | 2026-02-19 |
 | 3. Splits and Dataset Loader | 2/2 | Complete | 2026-02-20 |
 | 4. Model Training | 3/3 | Complete | 2026-02-20 |
-| 5. Evaluation | 1/2 | In progress | - |
+| 5. Evaluation | 2/2 | Complete | 2026-02-20 |
 | 6. Explainability and Inference | 0/2 | Not started | - |
 | 7. Documentation and Reports | 0/2 | Not started | - |
 | 8. Streamlit Demo (Optional) | 0/1 | Not started | - |
