@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Scaffold and Infrastructure** - Project skeleton, config, Makefile, reproducibility utilities
 - [x] **Phase 2: Data Acquisition and Audit** - Download BTXRD, profile the dataset, produce audit and spec documents
 - [x] **Phase 3: Splits and Dataset Loader** - Dual split strategy, split manifests, PyTorch dataset class, augmentation pipeline
-- [ ] **Phase 4: Model Training** - EfficientNet-B0 classifier, weighted loss, training loop with early stopping and checkpoints
+- [x] **Phase 4: Model Training** - EfficientNet-B0 classifier, weighted loss, training loop with early stopping and checkpoints
 - [ ] **Phase 5: Evaluation** - Full metric suite on both splits, bootstrap CIs, comparison against paper baseline
 - [ ] **Phase 6: Explainability and Inference** - Grad-CAM heatmaps, curated gallery, annotation comparison, single-image and batch inference
 - [ ] **Phase 7: Documentation and Reports** - Model card, PoC report with clinical framing and limitations
@@ -83,9 +83,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 04-01-PLAN.md -- Model architecture (BTXRDClassifier), factory functions, class weights, device detection, early stopping
-- [ ] 04-02-PLAN.md -- Training script with full loop, validation, logging, loss curves, and Makefile train-all target
-- [ ] 04-03-PLAN.md -- Train on both split strategies (stratified + center-holdout) and verify convergence
+- [x] 04-01-PLAN.md -- Model architecture (BTXRDClassifier), factory functions, class weights, device detection, early stopping
+- [x] 04-02-PLAN.md -- Training script with full loop, validation, logging, loss curves, and Makefile train-all target
+- [x] 04-03-PLAN.md -- Train on both split strategies (stratified + center-holdout) and verify convergence
 
 ### Phase 5: Evaluation
 **Goal**: Both trained models are comprehensively evaluated with clinically relevant metrics, producing a side-by-side comparison that reveals the generalization gap between stratified and center-holdout performance
@@ -97,11 +97,11 @@ Plans:
   3. A comparison table shows side-by-side metrics for both split strategies, making the center-holdout generalization gap explicit
   4. Bootstrap 95% confidence intervals (1000 iterations) are computed for AUC and per-class sensitivity, saved as JSON
   5. A comparison against the BTXRD paper's YOLOv8s-cls baseline is included, with caveats about differences in split methodology
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 05-01: Core metrics and visualization pipeline
-- [ ] 05-02: Dual-split comparison, bootstrap CIs, and baseline comparison
+- [ ] 05-01-PLAN.md -- Core metrics computation (ROC, PR, confusion matrix, sensitivity/specificity) and visualization pipeline with eval.py orchestration
+- [ ] 05-02-PLAN.md -- Bootstrap confidence intervals, dual-split comparison table, and BTXRD baseline comparison
 
 ### Phase 6: Explainability and Inference
 **Goal**: Clinicians can inspect Grad-CAM heatmaps showing where the model attends for each prediction, and a CLI tool produces predictions with confidence scores and visual overlays for any input image
@@ -157,7 +157,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 1. Scaffold and Infrastructure | 2/2 | Complete | 2026-02-19 |
 | 2. Data Acquisition and Audit | 2/2 | Complete | 2026-02-19 |
 | 3. Splits and Dataset Loader | 2/2 | Complete | 2026-02-20 |
-| 4. Model Training | 0/3 | Not started | - |
+| 4. Model Training | 3/3 | Complete | 2026-02-20 |
 | 5. Evaluation | 0/2 | Not started | - |
 | 6. Explainability and Inference | 0/2 | Not started | - |
 | 7. Documentation and Reports | 0/2 | Not started | - |
