@@ -41,14 +41,14 @@ Requirements for initial PoC release. Each maps to roadmap phases.
 
 ### Explainability
 
-- [ ] **EXPL-01**: Grad-CAM heatmap generation using pytorch-grad-cam on EfficientNet-B0 last conv layer
-- [ ] **EXPL-02**: Curated heatmap gallery: 3-5 examples each for TP, FP, FN per class, saved as image grid
-- [ ] **EXPL-03**: Heatmap overlay comparison against LabelMe tumor annotations (qualitative: does model attend to tumor region?)
+- [x] **EXPL-01**: Grad-CAM heatmap generation using pytorch-grad-cam on EfficientNet-B0 last conv layer
+- [x] **EXPL-02**: Curated heatmap gallery: 3-5 examples each for TP, FP, FN per class, saved as image grid
+- [x] **EXPL-03**: Heatmap overlay comparison against LabelMe tumor annotations (qualitative: does model attend to tumor region?)
 
 ### Inference
 
-- [ ] **INFR-01**: Single-image inference script: image path + checkpoint -> class prediction + softmax confidences + Grad-CAM overlay
-- [ ] **INFR-02**: Batch inference mode for evaluating a directory of images
+- [x] **INFR-01**: Single-image inference script: image path + checkpoint -> class prediction + softmax confidences + Grad-CAM overlay
+- [x] **INFR-02**: Batch inference mode for evaluating a directory of images
 
 ### Documentation
 
@@ -141,11 +141,11 @@ Deferred to future work. Tracked but not in current roadmap.
 | EVAL-06 | Phase 5 | Complete |
 | EVAL-07 | Phase 5 | Complete |
 | EVAL-08 | Phase 5 | Complete |
-| EXPL-01 | Phase 6 | Pending |
-| EXPL-02 | Phase 6 | Pending |
-| EXPL-03 | Phase 6 | Pending |
-| INFR-01 | Phase 6 | Pending |
-| INFR-02 | Phase 6 | Pending |
+| EXPL-01 | Phase 6 | Complete |
+| EXPL-02 | Phase 6 | Complete |
+| EXPL-03 | Phase 6 | Complete |
+| INFR-01 | Phase 6 | Complete |
+| INFR-02 | Phase 6 | Complete |
 | DOCS-03 | Phase 7 | Pending |
 | DOCS-04 | Phase 7 | Pending |
 | DEMO-01 | Phase 8 | Pending |
@@ -157,4 +157,4 @@ Deferred to future work. Tracked but not in current roadmap.
 
 ---
 *Requirements defined: 2026-02-19*
-*Last updated: 2026-02-20 after Phase 5 completion*
+*Last updated: 2026-02-20 after Phase 6 completion*

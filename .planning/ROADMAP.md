@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Splits and Dataset Loader** - Dual split strategy, split manifests, PyTorch dataset class, augmentation pipeline
 - [x] **Phase 4: Model Training** - EfficientNet-B0 classifier, weighted loss, training loop with early stopping and checkpoints
 - [x] **Phase 5: Evaluation** - Full metric suite on both splits, bootstrap CIs, comparison against paper baseline
-- [ ] **Phase 6: Explainability and Inference** - Grad-CAM heatmaps, curated gallery, annotation comparison, single-image and batch inference
+- [x] **Phase 6: Explainability and Inference** - Grad-CAM heatmaps, curated gallery, annotation comparison, single-image and batch inference
 - [ ] **Phase 7: Documentation and Reports** - Model card, PoC report with clinical framing and limitations
 - [ ] **Phase 8: Streamlit Demo (Optional)** - Interactive image upload with prediction and Grad-CAM overlay
 
@@ -116,8 +116,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 06-01-PLAN.md -- Grad-CAM utility module and curated TP/FP/FN gallery with annotation comparison
-- [ ] 06-02-PLAN.md -- Single-image and batch inference scripts with Grad-CAM overlay
+- [x] 06-01-PLAN.md -- Grad-CAM utility module and curated TP/FP/FN gallery with annotation comparison
+- [x] 06-02-PLAN.md -- Single-image and batch inference scripts with Grad-CAM overlay
 
 ### Phase 7: Documentation and Reports
 **Goal**: The PoC is fully documented with a model card, a comprehensive PoC report, and a README that enables clean-room reproduction -- documentation is the deliverable
@@ -159,6 +159,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 3. Splits and Dataset Loader | 2/2 | Complete | 2026-02-20 |
 | 4. Model Training | 3/3 | Complete | 2026-02-20 |
 | 5. Evaluation | 2/2 | Complete | 2026-02-20 |
-| 6. Explainability and Inference | 0/2 | Not started | - |
+| 6. Explainability and Inference | 2/2 | Complete | 2026-02-20 |
 | 7. Documentation and Reports | 0/2 | Not started | - |
 | 8. Streamlit Demo (Optional) | 0/1 | Not started | - |
