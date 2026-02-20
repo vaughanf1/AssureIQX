@@ -1,0 +1,186 @@
+{
+  "stratified": {
+    "metrics_summary": {
+      "split_strategy": "stratified",
+      "test_set_size": 564,
+      "macro_auc": 0.8455513462859999,
+      "per_class_auc": {
+        "Normal": 0.8430851063829787,
+        "Benign": 0.788015288015288,
+        "Malignant": 0.9055536444597332
+      },
+      "per_class_average_precision": {
+        "Normal": 0.8374697077203145,
+        "Benign": 0.7073395839551059,
+        "Malignant": 0.7140419719716263
+      },
+      "per_class_sensitivity": {
+        "Normal": 0.6063829787234043,
+        "Benign": 0.7835497835497836,
+        "Malignant": 0.6078431372549019
+      },
+      "per_class_specificity": {
+        "Normal": 0.8794326241134752,
+        "Benign": 0.6246246246246246,
+        "Malignant": 0.9571150097465887
+      },
+      "malignant_sensitivity": 0.6078431372549019,
+      "accuracy": 0.6790780141843972
+    },
+    "classification_report": {
+      "Normal": {
+        "precision": 0.8341463414634146,
+        "recall": 0.6063829787234043,
+        "f1-score": 0.702258726899384,
+        "support": 282.0
+      },
+      "Benign": {
+        "precision": 0.5915032679738562,
+        "recall": 0.7835497835497836,
+        "f1-score": 0.6741154562383612,
+        "support": 231.0
+      },
+      "Malignant": {
+        "precision": 0.5849056603773585,
+        "recall": 0.6078431372549019,
+        "f1-score": 0.5961538461538461,
+        "support": 51.0
+      },
+      "accuracy": 0.6790780141843972,
+      "macro avg": {
+        "precision": 0.6701850899382098,
+        "recall": 0.6659252998426965,
+        "f1-score": 0.6575093430971971,
+        "support": 564.0
+      },
+      "weighted avg": {
+        "precision": 0.7122282125423564,
+        "recall": 0.6790780141843972,
+        "f1-score": 0.6811373715080388,
+        "support": 564.0
+      }
+    },
+    "bootstrap_ci": {
+      "macro_auc": {
+        "mean": 0.8456176330697206,
+        "ci_lower": 0.8144436964898069,
+        "ci_upper": 0.8733576846103208,
+        "n_valid": 1000
+      },
+      "malignant_sensitivity": {
+        "mean": 0.6081724842436902,
+        "ci_lower": 0.4736602870813397,
+        "ci_upper": 0.742890365448505,
+        "n_valid": 1000
+      }
+    }
+  },
+  "center_holdout": {
+    "metrics_summary": {
+      "split_strategy": "center",
+      "test_set_size": 808,
+      "macro_auc": 0.6267292683029208,
+      "per_class_auc": {
+        "Normal": 0.6532567049808429,
+        "Benign": 0.5735920782366106,
+        "Malignant": 0.6533390216913088
+      },
+      "per_class_average_precision": {
+        "Normal": 0.5341029796319379,
+        "Benign": 0.5852478899284694,
+        "Malignant": 0.25478404999353244
+      },
+      "per_class_sensitivity": {
+        "Normal": 0.26223776223776224,
+        "Benign": 0.6433734939759036,
+        "Malignant": 0.3644859813084112
+      },
+      "per_class_specificity": {
+        "Normal": 0.8946360153256705,
+        "Benign": 0.4122137404580153,
+        "Malignant": 0.7988587731811697
+      },
+      "malignant_sensitivity": 0.3644859813084112,
+      "accuracy": 0.4715346534653465
+    },
+    "classification_report": {
+      "Normal": {
+        "precision": 0.5769230769230769,
+        "recall": 0.26223776223776224,
+        "f1-score": 0.3605769230769231,
+        "support": 286.0
+      },
+      "Benign": {
+        "precision": 0.536144578313253,
+        "recall": 0.6433734939759036,
+        "f1-score": 0.5848849945235487,
+        "support": 415.0
+      },
+      "Malignant": {
+        "precision": 0.21666666666666667,
+        "recall": 0.3644859813084112,
+        "f1-score": 0.27177700348432055,
+        "support": 107.0
+      },
+      "accuracy": 0.4715346534653465,
+      "macro avg": {
+        "precision": 0.4432447739676655,
+        "recall": 0.4233657458406923,
+        "f1-score": 0.4057463070282641,
+        "support": 808.0
+      },
+      "weighted avg": {
+        "precision": 0.5082714521452145,
+        "recall": 0.4715346534653465,
+        "f1-score": 0.46402526250011766,
+        "support": 808.0
+      }
+    },
+    "bootstrap_ci": {
+      "macro_auc": {
+        "mean": 0.6267017753708426,
+        "ci_lower": 0.5943052354687769,
+        "ci_upper": 0.658258547856385,
+        "n_valid": 1000
+      },
+      "malignant_sensitivity": {
+        "mean": 0.3642783526949728,
+        "ci_lower": 0.26955685618729097,
+        "ci_upper": 0.4482758620689655,
+        "n_valid": 1000
+      }
+    }
+  },
+  "btxrd_baseline": {
+    "model": "YOLOv8s-cls",
+    "source": "Yao et al., Scientific Data 2025 (PMC11739492)",
+    "split": "Random 80/20 (no patient grouping)",
+    "image_size": 600,
+    "epochs": 300,
+    "per_class_precision": {
+      "Normal": 0.913,
+      "Benign": 0.881,
+      "Malignant": 0.734
+    },
+    "per_class_recall": {
+      "Normal": 0.898,
+      "Benign": 0.875,
+      "Malignant": 0.839
+    },
+    "caveats": [
+      "Random 80/20 split without patient-level grouping (potential data leakage)",
+      "Validation set used for reporting (no separate held-out test set)",
+      "Different image size (600px vs 224px)",
+      "Different architecture (YOLOv8s-cls vs EfficientNet-B0)",
+      "Different training duration (300 epochs vs early stopping at ~5 epochs)",
+      "Paper reports mAP@0.5 (detection metric) which is not directly comparable to AUC",
+      "No macro AUC or specificity reported in paper -- only precision/recall per class"
+    ]
+  },
+  "generalization_gap": {
+    "description": "center_holdout minus stratified (negative means center-holdout is worse)",
+    "macro_auc_gap": -0.21882207798307918,
+    "malignant_sensitivity_gap": -0.2433571559464907,
+    "accuracy_gap": -0.20754336071905066
+  }
+}
