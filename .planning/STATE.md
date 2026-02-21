@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-19)
 
 **Core value:** Deliver a reproducible, auditable 3-class bone tumor classification baseline with clear explainability outputs that a clinician can inspect and trust.
-**Current focus:** Phase 6 - Explainability and Inference (Complete)
+**Current focus:** Phase 7 - Documentation and Reports (In progress)
 
 ## Current Position
 
-Phase: 6 of 8 (Explainability and Inference) -- Complete
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-02-20 -- Completed 06-02-PLAN.md
+Phase: 7 of 8 (Documentation and Reports) -- In progress
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-02-21 -- Completed 07-01-PLAN.md
 
-Progress: [█████████████░░░] 13/16 (81%)
+Progress: [██████████████░░] 14/16 (88%)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
+- Total plans completed: 14
 - Average duration: 5.5 min
-- Total execution time: 76 min
+- Total execution time: 81 min
 
 **By Phase:**
 
@@ -33,10 +33,11 @@ Progress: [█████████████░░░] 13/16 (81%)
 | 04 Model Training | 3/3 | 5 min | 1.7 min |
 | 05 Evaluation | 2/2 | 24 min | 12 min |
 | 06 Explainability | 2/2 | 5 min | 2.5 min |
+| 07 Documentation | 1/2 | 5 min | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-03 (n/a), 05-01 (10 min), 05-02 (14 min), 06-01 (2 min), 06-02 (3 min)
-- Trend: Phase 6 fast due to reuse of inference and Grad-CAM patterns from Phases 4-5
+- Last 5 plans: 05-01 (10 min), 05-02 (14 min), 06-01 (2 min), 06-02 (3 min), 07-01 (5 min)
+- Trend: Documentation plan efficient due to well-structured data sources from prior phases
 
 *Updated after each plan completion*
 
@@ -93,6 +94,9 @@ Recent decisions affecting current work:
 - [06-02]: Grad-CAM targets predicted class at inference (ground truth unavailable)
 - [06-02]: Class names loaded from checkpoint metadata for portability
 - [06-02]: PIL.Image.fromarray for overlay saving (avoids BGR/RGB cv2 confusion)
+- [07-01]: Mitchell et al. 2019 format for model card (9 sections plus references)
+- [07-01]: Clinical decision framing as sensitivity at specificity
+- [07-01]: 9 documented limitations covering data, model, and evaluation concerns
 
 ### Pending Todos
 
@@ -100,14 +104,14 @@ None.
 
 ### Blockers/Concerns
 
-- [03-01]: Center 3 has only 27 Normal images in center-holdout test set -- model evaluation should note this imbalance
-- [03-01]: Same-lesion multi-angle image leakage risk documented but NOT mitigated (no patient_id available)
-- [05-01]: Center-holdout generalization gap is substantial (macro AUC 0.627 vs 0.846 stratified) -- expected but important for Phase 7 reporting
-- [05-02]: Malignant sensitivity CI width is 27 percentage points (0.474-0.743) due to only 51 test samples -- Phase 7 must flag this as a key limitation
-- [06-01]: Low Grad-CAM IoU (mean 0.070) suggests model attention not strongly correlated with expert tumor annotations -- important limitation for Phase 7 reporting
+- [03-01]: Center 3 has only 27 Normal images in center-holdout test set -- documented in model card and PoC report
+- [03-01]: Same-lesion multi-angle image leakage risk documented in both deliverables as limitation #1
+- [05-01]: Center-holdout generalization gap documented with full comparison table in both deliverables
+- [05-02]: Malignant sensitivity CI width (27 pp) documented as limitation #6 in both deliverables
+- [06-01]: Low Grad-CAM IoU (mean 0.070) documented as limitation #7 in both deliverables
 
 ## Session Continuity
 
-Last session: 2026-02-20T19:00Z
-Stopped at: Completed 06-02-PLAN.md (Phase 6 complete)
+Last session: 2026-02-21T02:19Z
+Stopped at: Completed 07-01-PLAN.md
 Resume file: None
