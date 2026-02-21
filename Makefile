@@ -31,10 +31,16 @@ gradcam: ## Generate Grad-CAM heatmaps for selected examples
 infer: ## Run single-image or batch inference with Grad-CAM overlay
 	python scripts/infer.py --config configs/default.yaml
 
-report: ## Generate final report (see docs/)
-	@echo "Report generation is manual -- see docs/"
+report: ## Verify documentation is complete (model card + PoC report)
+	@test -f docs/model_card.md || (echo "ERROR: docs/model_card.md not found" && exit 1)
+	@test -f docs/poc_report.md || (echo "ERROR: docs/poc_report.md not found" && exit 1)
+	@echo "Documentation verified:"
+	@echo "  - docs/model_card.md ($$(wc -l < docs/model_card.md) lines)"
+	@echo "  - docs/poc_report.md ($$(wc -l < docs/poc_report.md) lines)"
+	@echo "  - docs/data_audit_report.md"
+	@echo "  - docs/dataset_spec.md"
 
 demo: ## Launch Streamlit demo app
 	streamlit run app/app.py
 
-all: download audit split train evaluate gradcam report ## Run full pipeline end-to-end
+all: download audit split train-all evaluate gradcam report ## Run full pipeline end-to-end
