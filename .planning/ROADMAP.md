@@ -142,10 +142,10 @@ Plans:
   1. Running `make demo` (or `streamlit run app/app.py`) launches a local web app that allows image upload
   2. Uploaded images produce a class prediction with confidence bar chart and Grad-CAM heatmap overlay, matching the output of the CLI inference script
   3. A prominent "NOT FOR CLINICAL USE -- Research Prototype Only" disclaimer is visible on every page of the app
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 08-01: Streamlit demo application
+- [ ] 08-01-PLAN.md -- Streamlit demo app with image upload, prediction, confidence bars, and Grad-CAM overlay
 
 ## Progress
 
