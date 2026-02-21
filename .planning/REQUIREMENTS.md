@@ -54,8 +54,8 @@ Requirements for initial PoC release. Each maps to roadmap phases.
 
 - [x] **DOCS-01**: `dataset_spec.md` -- column definitions, label schema, data provenance, license (CC BY-NC-ND 4.0)
 - [x] **DOCS-02**: `data_audit_report.md` -- auto-generated from audit script with embedded figures
-- [ ] **DOCS-03**: `model_card.md` -- architecture, training data, performance, limitations, ethical considerations
-- [ ] **DOCS-04**: `poc_report.md` -- executive summary, methods, results (both splits), clinical relevance, limitations, next steps
+- [x] **DOCS-03**: `model_card.md` -- architecture, training data, performance, limitations, ethical considerations
+- [x] **DOCS-04**: `poc_report.md` -- executive summary, methods, results (both splits), clinical relevance, limitations, next steps
 - [ ] **DOCS-05**: `README.md` -- setup instructions, data download, train/eval/infer commands, project structure
 - [ ] **DOCS-06**: `requirements.txt` -- pinned Python dependencies
 
@@ -146,8 +146,8 @@ Deferred to future work. Tracked but not in current roadmap.
 | EXPL-03 | Phase 6 | Complete |
 | INFR-01 | Phase 6 | Complete |
 | INFR-02 | Phase 6 | Complete |
-| DOCS-03 | Phase 7 | Pending |
-| DOCS-04 | Phase 7 | Pending |
+| DOCS-03 | Phase 7 | Complete |
+| DOCS-04 | Phase 7 | Complete |
 | DEMO-01 | Phase 8 | Pending |
 
 **Coverage:**

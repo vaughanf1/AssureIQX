@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Model Training** - EfficientNet-B0 classifier, weighted loss, training loop with early stopping and checkpoints
 - [x] **Phase 5: Evaluation** - Full metric suite on both splits, bootstrap CIs, comparison against paper baseline
 - [x] **Phase 6: Explainability and Inference** - Grad-CAM heatmaps, curated gallery, annotation comparison, single-image and batch inference
-- [ ] **Phase 7: Documentation and Reports** - Model card, PoC report with clinical framing and limitations
+- [x] **Phase 7: Documentation and Reports** - Model card, PoC report with clinical framing and limitations
 - [ ] **Phase 8: Streamlit Demo (Optional)** - Interactive image upload with prediction and Grad-CAM overlay
 
 ## Phase Details
@@ -131,8 +131,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 07-01-PLAN.md -- Model card (Mitchell et al. 2019 format) and comprehensive PoC report with clinical framing
-- [ ] 07-02-PLAN.md -- README finalization with complete reproduction guide and Makefile updates
+- [x] 07-01-PLAN.md -- Model card (Mitchell et al. 2019 format) and comprehensive PoC report with clinical framing
+- [x] 07-02-PLAN.md -- README finalization with complete reproduction guide and Makefile updates
 
 ### Phase 8: Streamlit Demo (Optional)
 **Goal**: A non-technical user can upload a radiograph image and see a prediction with confidence bars and Grad-CAM overlay in a browser, with a clear disclaimer that this is not for clinical use
@@ -160,5 +160,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 4. Model Training | 3/3 | Complete | 2026-02-20 |
 | 5. Evaluation | 2/2 | Complete | 2026-02-20 |
 | 6. Explainability and Inference | 2/2 | Complete | 2026-02-20 |
-| 7. Documentation and Reports | 0/2 | Not started | - |
+| 7. Documentation and Reports | 2/2 | Complete | 2026-02-21 |
 | 8. Streamlit Demo (Optional) | 0/1 | Not started | - |
