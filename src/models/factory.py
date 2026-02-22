@@ -49,7 +49,8 @@ def create_model(config: dict) -> BTXRDClassifier:
     """Create a BTXRDClassifier from a config dict.
 
     Reads config["model"] section for backbone, num_classes, pretrained,
-    and dropout parameters.
+    and dropout parameters. If ``model.attn_layer`` is set (e.g., "cbam"),
+    it is passed through as ``block_args=dict(attn_layer=...)`` to timm.
 
     Args:
         config: Full config dict (e.g., from configs/default.yaml).
@@ -58,11 +59,19 @@ def create_model(config: dict) -> BTXRDClassifier:
         Configured BTXRDClassifier instance.
     """
     model_cfg = config["model"]
+
+    # Build extra kwargs for timm.create_model (e.g., CBAM attention)
+    kwargs: dict = {}
+    attn_layer = model_cfg.get("attn_layer")
+    if attn_layer:
+        kwargs["block_args"] = dict(attn_layer=attn_layer)
+
     return BTXRDClassifier(
         backbone=model_cfg["backbone"],
         num_classes=model_cfg["num_classes"],
         pretrained=model_cfg["pretrained"],
         drop_rate=model_cfg.get("dropout", 0.2),
+        **kwargs,
     )
 
 

@@ -1,18 +1,15 @@
-"""EfficientNet-B0 classifier with configurable output head.
+"""Multi-architecture classifier with configurable backbone and output head.
 
-Wraps timm's EfficientNet-B0 (timm 1.0.15) in a thin nn.Module that:
+Wraps timm model families in a thin nn.Module that:
 - Exposes raw logits (no softmax) for CrossEntropyLoss compatibility
-- Reports num_features (1280) for downstream feature extraction
-- Provides gradcam_target_layer property for Phase 6 Grad-CAM
+- Reports num_features for downstream feature extraction
+- Provides gradcam_target_layer property for Grad-CAM visualization
+- Passes **kwargs through to timm.create_model (e.g., block_args for CBAM)
 
-Architecture (EfficientNet-B0 via timm):
-- Backbone: EfficientNet-B0 with ImageNet-pretrained weights
-- Classifier head: Linear(1280, num_classes) -- replaced by timm
-- Dropout: Configurable via drop_rate (default 0.2)
-- Total parameters: 4,011,391 (with num_classes=3)
-- Full fine-tuning: All parameters trainable (no frozen layers)
+Supports EfficientNet-B0 through B7, ResNet-50 (with optional CBAM attention),
+and other timm backbones.
 
-Implemented in Phase 4.
+Implemented in Phase 4, updated in Phase 9 for multi-architecture support.
 """
 
 from __future__ import annotations
@@ -23,15 +20,21 @@ import torch.nn as nn
 
 
 class BTXRDClassifier(nn.Module):
-    """EfficientNet-B0 classifier for 3-class bone tumor classification.
+    """Multi-architecture classifier for 3-class bone tumor classification.
 
     Produces raw logits (NOT softmax) -- use with nn.CrossEntropyLoss.
 
+    Supported architectures:
+    - EfficientNet-B0 through B7 (gradcam via model.bn2)
+    - ResNet-50 with optional CBAM attention (gradcam via model.layer4[-1])
+
     Args:
-        backbone: timm model name (default: "efficientnet_b0").
+        backbone: timm model name (e.g., "efficientnet_b0", "resnet50").
         num_classes: Number of output classes (default: 3).
         pretrained: Whether to load ImageNet-pretrained weights.
         drop_rate: Dropout rate applied before classifier head.
+        **kwargs: Additional arguments passed to timm.create_model
+            (e.g., block_args=dict(attn_layer='cbam') for CBAM attention).
     """
 
     def __init__(
@@ -40,6 +43,7 @@ class BTXRDClassifier(nn.Module):
         num_classes: int = 3,
         pretrained: bool = True,
         drop_rate: float = 0.2,
+        **kwargs,
     ) -> None:
         super().__init__()
         self.model = timm.create_model(
@@ -47,6 +51,7 @@ class BTXRDClassifier(nn.Module):
             pretrained=pretrained,
             num_classes=num_classes,
             drop_rate=drop_rate,
+            **kwargs,
         )
         self.num_classes = num_classes
         self.num_features = self.model.num_features  # 1280 for efficientnet_b0
@@ -66,8 +71,22 @@ class BTXRDClassifier(nn.Module):
     def gradcam_target_layer(self) -> nn.Module:
         """Return the layer to use for Grad-CAM visualization.
 
-        Returns the final BatchNormAct2d (1280 channels) before global
-        average pooling -- confirmed as the correct Grad-CAM target for
-        EfficientNet-B0 with pytorch-grad-cam 1.5.5.
+        Architecture-specific target layers:
+        - EfficientNet: model.bn2 (final BatchNormAct2d before GAP)
+        - ResNet: model.layer4[-1] (last bottleneck block)
+
+        Falls back to the last convolutional module if neither is present.
         """
-        return self.model.bn2
+        if hasattr(self.model, "bn2"):
+            return self.model.bn2  # EfficientNet family
+        if hasattr(self.model, "layer4"):
+            return self.model.layer4[-1]  # ResNet family
+        # Fallback: walk backwards through modules to find last BatchNorm or Conv2d
+        for module in reversed(list(self.model.modules())):
+            if isinstance(module, (nn.BatchNorm2d, nn.Conv2d)):
+                return module
+        raise AttributeError(
+            f"Cannot find Grad-CAM target layer for backbone. "
+            f"Model has no bn2 or layer4 attribute and no "
+            f"BatchNorm2d/Conv2d modules."
+        )
