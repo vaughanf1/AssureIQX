@@ -303,6 +303,12 @@ def main() -> None:
         default=[],
         help="Config overrides in key.subkey=value format",
     )
+    parser.add_argument(
+        "--checkpoint-dir",
+        type=str,
+        default=None,
+        help="Override checkpoint directory (default: from config paths.checkpoints_dir)",
+    )
     args = parser.parse_args()
 
     # Configure logging
@@ -312,6 +318,10 @@ def main() -> None:
     )
 
     cfg = load_config(args.config, overrides=args.override)
+
+    # Apply checkpoint directory override if provided
+    if args.checkpoint_dir is not None:
+        cfg["paths"]["checkpoints_dir"] = args.checkpoint_dir
     set_seed(cfg.get("seed", 42))
 
     # Device

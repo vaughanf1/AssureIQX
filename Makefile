@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 
-.PHONY: help download audit split train train-all evaluate gradcam infer report demo all
+.PHONY: help download audit split train train-all evaluate gradcam infer report demo benchmark all
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -42,5 +42,8 @@ report: ## Verify documentation is complete (model card + PoC report)
 
 demo: ## Launch Streamlit demo app
 	streamlit run app/app.py
+
+benchmark: ## Run model improvement benchmark (all experiments)
+	python scripts/benchmark.py --config configs/default.yaml
 
 all: download audit split train-all evaluate gradcam report ## Run full pipeline end-to-end
