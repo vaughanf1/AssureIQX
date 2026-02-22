@@ -3,17 +3,18 @@
 # Override any value via CLI: --override training.batch_size=64
 
 seed: 42
-device: auto  # auto | cpu | cuda
+device: auto  # auto | cpu | cuda | mps
 
 # ── Data ─────────────────────────────────────────────
 data:
   raw_dir: data_raw
   splits_dir: data/splits
-  image_size: 224
+  image_size: 380
   num_workers: 4
   train_split: 0.70
   val_split: 0.15
   test_split: 0.15
+  annotations_dir: data_raw/Annotations
   figshare_url: "https://ndownloader.figshare.com/files/50653575"
   figshare_article_id: 27865398
   figshare_file_id: 50653575
@@ -22,10 +23,10 @@ data:
 
 # ── Model ────────────────────────────────────────────
 model:
-  backbone: efficientnet_b0
+  backbone: efficientnet_b3
   pretrained: true
   num_classes: 3
-  dropout: 0.2
+  dropout: 0.3
   class_names:
     - Normal
     - Benign
@@ -33,11 +34,13 @@ model:
 
 # ── Training ─────────────────────────────────────────
 training:
-  batch_size: 32
-  learning_rate: 0.001
+  batch_size: 16
+  learning_rate: 0.0003
   weight_decay: 0.0001
   epochs: 50
-  early_stopping_patience: 7
+  early_stopping_patience: 15
+  warmup_epochs: 3
+  label_smoothing: 0.1
   scheduler: cosine
   class_weights: auto
   loss_type: cross_entropy

@@ -333,7 +333,11 @@ def main() -> None:
 
     # Paths
     images_dir = PROJECT_ROOT / cfg["data"]["raw_dir"] / "images"
-    annotations_dir = PROJECT_ROOT / cfg["data"]["raw_dir"] / "annotations"
+    annotations_dir_rel = cfg["data"].get("annotations_dir")
+    if annotations_dir_rel:
+        annotations_dir = PROJECT_ROOT / annotations_dir_rel
+    else:
+        annotations_dir = PROJECT_ROOT / cfg["data"]["raw_dir"] / "Annotations"
     results_dir = PROJECT_ROOT / cfg["paths"]["results_dir"]
     output_dir = results_dir / "gradcam"
     output_dir.mkdir(parents=True, exist_ok=True)

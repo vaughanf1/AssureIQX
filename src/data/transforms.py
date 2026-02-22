@@ -40,7 +40,22 @@ def get_train_transforms(image_size: int = 224) -> A.Compose:
         [
             A.CLAHE(clip_limit=4.0, tile_grid_size=(8, 8), p=1.0),
             A.HorizontalFlip(p=0.5),
-            A.Rotate(limit=15, border_mode=0, fill=0, p=0.5),
+            A.Affine(
+                translate_percent={"x": (-0.05, 0.05), "y": (-0.05, 0.05)},
+                scale=(0.9, 1.1),
+                rotate=(-15, 15),
+                border_mode=0, fill=0, p=0.5,
+            ),
+            A.RandomBrightnessContrast(
+                brightness_limit=0.1, contrast_limit=0.1, p=0.3,
+            ),
+            A.GaussNoise(std_range=(0.01, 0.05), p=0.2),
+            A.CoarseDropout(
+                num_holes_range=(1, 8),
+                hole_height_range=(8, 32),
+                hole_width_range=(8, 32),
+                fill=0, p=0.3,
+            ),
             A.Resize(height=image_size, width=image_size),
             A.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
             ToTensorV2(),

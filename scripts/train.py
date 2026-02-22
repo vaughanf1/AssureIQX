@@ -43,7 +43,7 @@ from tqdm import tqdm
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.data.dataset import BTXRDDataset, create_dataloader
+from src.data.dataset import BTXRDAnnotatedDataset, BTXRDDataset, create_dataloader
 from src.data.transforms import get_train_transforms, get_val_transforms
 from src.models.factory import (
     EarlyStopping,
@@ -307,9 +307,30 @@ def main() -> None:
 
     # ── Datasets ──────────────────────────────────────────
     image_size = cfg["data"]["image_size"]
-    train_dataset = BTXRDDataset(
-        train_csv, images_dir, get_train_transforms(image_size)
-    )
+    annotations_dir_rel = cfg["data"].get("annotations_dir")
+
+    if annotations_dir_rel:
+        annotations_dir = PROJECT_ROOT / annotations_dir_rel
+        if annotations_dir.is_dir():
+            logger.info("Using annotation-guided dataset from %s", annotations_dir)
+            train_dataset = BTXRDAnnotatedDataset(
+                train_csv, images_dir, annotations_dir,
+                get_train_transforms(image_size),
+            )
+        else:
+            logger.warning(
+                "annotations_dir configured (%s) but not found, "
+                "falling back to standard dataset.",
+                annotations_dir,
+            )
+            train_dataset = BTXRDDataset(
+                train_csv, images_dir, get_train_transforms(image_size)
+            )
+    else:
+        train_dataset = BTXRDDataset(
+            train_csv, images_dir, get_train_transforms(image_size)
+        )
+
     val_dataset = BTXRDDataset(
         val_csv, images_dir, get_val_transforms(image_size)
     )
@@ -341,8 +362,13 @@ def main() -> None:
 
     # ── Loss functions ────────────────────────────────────
     # CRITICAL: Weighted loss for training, unweighted for validation/early stopping
-    train_criterion = nn.CrossEntropyLoss(weight=class_weights)
+    label_smoothing = cfg["training"].get("label_smoothing", 0.0)
+    train_criterion = nn.CrossEntropyLoss(
+        weight=class_weights, label_smoothing=label_smoothing,
+    )
     val_criterion = nn.CrossEntropyLoss()
+    if label_smoothing > 0:
+        logger.info("Label smoothing: %.2f", label_smoothing)
 
     # ── Optimizer ─────────────────────────────────────────
     optimizer = optim.AdamW(
@@ -351,11 +377,35 @@ def main() -> None:
         weight_decay=cfg["training"]["weight_decay"],
     )
 
-    # ── Scheduler ─────────────────────────────────────────
+    # ── Scheduler (warmup + cosine annealing) ───────────
     epochs = cfg["training"]["epochs"]
-    scheduler = lr_scheduler.CosineAnnealingLR(
-        optimizer, T_max=epochs, eta_min=1e-6
-    )
+    warmup_epochs = cfg["training"].get("warmup_epochs", 0)
+
+    # Clamp warmup to leave at least 1 epoch for cosine annealing
+    if warmup_epochs >= epochs:
+        warmup_epochs = max(epochs - 1, 0)
+        logger.warning(
+            "warmup_epochs clamped to %d (must be < epochs=%d)",
+            warmup_epochs, epochs,
+        )
+
+    if warmup_epochs > 0:
+        warmup_scheduler = lr_scheduler.LinearLR(
+            optimizer, start_factor=0.01, total_iters=warmup_epochs,
+        )
+        cosine_scheduler = lr_scheduler.CosineAnnealingLR(
+            optimizer, T_max=epochs - warmup_epochs, eta_min=1e-6,
+        )
+        scheduler = lr_scheduler.SequentialLR(
+            optimizer,
+            schedulers=[warmup_scheduler, cosine_scheduler],
+            milestones=[warmup_epochs],
+        )
+        logger.info("Scheduler: %d-epoch warmup + cosine annealing", warmup_epochs)
+    else:
+        scheduler = lr_scheduler.CosineAnnealingLR(
+            optimizer, T_max=epochs, eta_min=1e-6,
+        )
 
     # ── Early stopping ────────────────────────────────────
     early_stopping = EarlyStopping(

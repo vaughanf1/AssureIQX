@@ -142,11 +142,12 @@ def build_override_args(experiment: dict, split_strategy: str) -> list[str]:
     if experiment["attn_layer"]:
         overrides.append(f"model.attn_layer={experiment['attn_layer']}")
 
-    result = []
-    for ov in overrides:
-        result.extend(["--override", ov])
-
-    return result
+    # Pass all overrides as values to a single --override flag.
+    # argparse nargs="*" treats each --override as a new list, so only
+    # the last one would survive if we used multiple --override flags.
+    if overrides:
+        return ["--override"] + overrides
+    return []
 
 
 def run_experiment(
@@ -230,14 +231,25 @@ def run_experiment(
                 continue
 
             # Run eval.py with checkpoint-dir override and experiment results dir
+            # All overrides passed as values to a single --override flag
+            # (argparse nargs="*" treats each --override as a new list)
+            eval_overrides = [
+                f"paths.results_dir=results/experiments/{exp_id}",
+                f"evaluation.split_strategies=[{split}]",
+            ]
+            model_overrides = build_override_args(experiment, split)
+            # build_override_args returns ["--override", "k1=v1", "k2=v2", ...]
+            # Extract just the override values (skip the "--override" prefix)
+            if model_overrides:
+                eval_overrides.extend(model_overrides[1:])  # skip first "--override"
+
             eval_cmd = [
                 sys.executable,
                 str(PROJECT_ROOT / "scripts" / "eval.py"),
                 "--config", config_path,
                 "--checkpoint-dir", str(exp_ckpt_dir),
-                "--override", f"paths.results_dir=results/experiments/{exp_id}",
-                "--override", f"evaluation.split_strategies=[{split}]",
-            ] + build_override_args(experiment, split)
+                "--override",
+            ] + eval_overrides
 
             logger.info("Eval command: %s", " ".join(eval_cmd))
 

@@ -12,9 +12,11 @@ Implemented in Phase 3.
 
 from __future__ import annotations
 
+import json
 import logging
 from pathlib import Path
 
+import cv2
 import numpy as np
 import pandas as pd
 import torch
@@ -163,3 +165,138 @@ def create_dataloader(
         pin_memory=pin_memory,
         drop_last=False,
     )
+
+
+def load_annotation_mask_raw(ann_path: str | Path) -> np.ndarray | None:
+    """Load a LabelMe JSON annotation and rasterize to a binary mask.
+
+    Returns the mask at the original image dimensions (no resizing).
+    Supports polygon and rectangle shape types.
+
+    Args:
+        ann_path: Path to LabelMe JSON annotation file.
+
+    Returns:
+        Binary uint8 mask of shape (H, W) with values 0 or 1,
+        or None if the file cannot be loaded.
+    """
+    ann_path = Path(ann_path)
+    if not ann_path.exists():
+        return None
+
+    with open(ann_path) as f:
+        data = json.load(f)
+
+    h = data["imageHeight"]
+    w = data["imageWidth"]
+    mask = np.zeros((h, w), dtype=np.uint8)
+
+    for shape in data["shapes"]:
+        pts = np.array(shape["points"], dtype=np.int32)
+        shape_type = shape["shape_type"]
+
+        if shape_type == "polygon":
+            cv2.fillPoly(mask, [pts], 1)
+        elif shape_type == "rectangle":
+            x1, y1 = pts[0]
+            x2, y2 = pts[1]
+            cv2.rectangle(mask, (int(x1), int(y1)), (int(x2), int(y2)), 1, -1)
+
+    return mask
+
+
+class BTXRDAnnotatedDataset(Dataset):
+    """Annotation-aware dataset that adds ROI-guided samples for tumor images.
+
+    For tumor images (Benign/Malignant) with LabelMe annotations, this dataset
+    creates an additional ROI-guided sample where non-tumor regions are dimmed
+    by 50%. This effectively doubles the tumor class samples (helping class
+    imbalance) and guides model attention toward annotated regions.
+
+    Normal images are passed through unchanged (they have no annotations).
+
+    Args:
+        manifest_csv: Path to split manifest CSV (image_id, split, label).
+        images_dir: Directory containing the radiograph image files.
+        annotations_dir: Directory containing LabelMe JSON annotations.
+        transform: Optional albumentations Compose pipeline to apply.
+        dim_factor: Factor to dim non-ROI regions (0.5 = 50% dimming).
+    """
+
+    def __init__(
+        self,
+        manifest_csv: str | Path,
+        images_dir: str | Path,
+        annotations_dir: str | Path,
+        transform: object | None = None,
+        dim_factor: float = 0.5,
+    ) -> None:
+        self.base = BTXRDDataset(manifest_csv, images_dir, transform=None)
+        self.annotations_dir = Path(annotations_dir)
+        self.transform = transform
+        self.dim_factor = dim_factor
+
+        # Build index: original samples + ROI-guided duplicates for annotated tumors
+        self._index: list[tuple[int, bool]] = []  # (base_idx, is_roi_guided)
+        self._annotation_cache: dict[int, np.ndarray | None] = {}
+
+        for i in range(len(self.base)):
+            self._index.append((i, False))  # original sample
+
+            label_str = self.base.df.iloc[i]["label"]
+            if label_str in ("Benign", "Malignant"):
+                image_id = self.base.df.iloc[i]["image_id"]
+                ann_stem = Path(image_id).stem
+                ann_path = self.annotations_dir / f"{ann_stem}.json"
+                mask = load_annotation_mask_raw(ann_path)
+                if mask is not None:
+                    self._annotation_cache[i] = mask
+                    self._index.append((i, True))  # ROI-guided duplicate
+
+        n_roi = sum(1 for _, is_roi in self._index if is_roi)
+        logger.info(
+            "BTXRDAnnotatedDataset: %d base + %d ROI-guided = %d total samples",
+            len(self.base),
+            n_roi,
+            len(self._index),
+        )
+
+    def __len__(self) -> int:
+        return len(self._index)
+
+    def __getitem__(self, idx: int) -> tuple[torch.Tensor, int]:
+        base_idx, is_roi_guided = self._index[idx]
+        row = self.base.df.iloc[base_idx]
+        label_idx = CLASS_TO_IDX[row["label"]]
+
+        image_path = self.base.images_dir / row["image_id"]
+        image = Image.open(image_path).convert("RGB")
+        image = np.array(image)
+
+        if is_roi_guided:
+            mask = self._annotation_cache[base_idx]
+            # Resize mask to match image dimensions
+            if mask.shape[:2] != image.shape[:2]:
+                mask = cv2.resize(
+                    mask, (image.shape[1], image.shape[0]),
+                    interpolation=cv2.INTER_NEAREST,
+                )
+            # Dim non-ROI regions
+            dimmed = (image * self.dim_factor).astype(np.uint8)
+            mask_3ch = np.stack([mask] * 3, axis=-1)
+            image = np.where(mask_3ch, image, dimmed)
+
+        if self.transform is not None:
+            transformed = self.transform(image=image)
+            image = transformed["image"]
+
+        return image, label_idx
+
+    @property
+    def labels(self) -> list[int]:
+        """Return list of integer label indices for all samples (including ROI-guided)."""
+        result = []
+        for base_idx, _ in self._index:
+            label_str = self.base.df.iloc[base_idx]["label"]
+            result.append(CLASS_TO_IDX[label_str])
+        return result

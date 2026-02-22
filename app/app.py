@@ -22,6 +22,8 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
+import json  # noqa: E402
+
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 import streamlit as st  # noqa: E402
@@ -39,7 +41,7 @@ from src.models.factory import create_model, get_device, load_checkpoint  # noqa
 
 # -- Constants ----------------------------------------------------------------
 DEFAULT_CHECKPOINT = PROJECT_ROOT / "checkpoints" / "best_stratified.pt"
-IMAGE_SIZE = 224
+RESULTS_DIR = PROJECT_ROOT / "results"
 
 
 @st.cache_resource
@@ -53,7 +55,7 @@ def load_model(checkpoint_path: str):
         checkpoint_path: Path to .pt checkpoint file.
 
     Returns:
-        Tuple of (model, class_names, device).
+        Tuple of (model, class_names, device, image_size).
     """
     device = get_device("auto")
     ckpt = load_checkpoint(checkpoint_path, device="cpu")
@@ -61,7 +63,8 @@ def load_model(checkpoint_path: str):
     model.load_state_dict(ckpt["model_state_dict"])
     model = model.to(device)
     model.eval()
-    return model, ckpt["class_names"], device
+    image_size = ckpt["config"]["data"].get("image_size", 224)
+    return model, ckpt["class_names"], device, image_size
 
 
 def run_inference(
@@ -128,7 +131,7 @@ def main() -> None:
     )
 
     # -- Load model (cached) --------------------------------------------------
-    model, class_names, device = load_model(str(DEFAULT_CHECKPOINT))
+    model, class_names, device, image_size = load_model(str(DEFAULT_CHECKPOINT))
 
     # -- File upload ----------------------------------------------------------
     uploaded_file = st.file_uploader(
@@ -141,7 +144,7 @@ def main() -> None:
         image_np = np.array(pil_image)
 
         # Preprocess with the same deterministic pipeline as evaluation
-        transform = get_test_transforms(IMAGE_SIZE)
+        transform = get_test_transforms(image_size)
         transformed = transform(image=image_np)
         input_tensor = transformed["image"].unsqueeze(0)
 
@@ -174,6 +177,116 @@ def main() -> None:
             }
         )
         st.bar_chart(scores_df, x="Class", y="Confidence", horizontal=True)
+
+    # -- Model Performance Section --------------------------------------------
+    st.divider()
+    st.header("Model Performance")
+
+    # Load metrics from results/
+    strat_metrics_path = RESULTS_DIR / "stratified" / "metrics_summary.json"
+    center_metrics_path = RESULTS_DIR / "center_holdout" / "metrics_summary.json"
+    strat_report_path = RESULTS_DIR / "stratified" / "classification_report.json"
+    center_report_path = RESULTS_DIR / "center_holdout" / "classification_report.json"
+
+    if strat_metrics_path.exists() and center_metrics_path.exists():
+        strat_m = json.loads(strat_metrics_path.read_text())
+        center_m = json.loads(center_metrics_path.read_text())
+        strat_r = json.loads(strat_report_path.read_text())
+        center_r = json.loads(center_report_path.read_text())
+
+        tab1, tab2, tab3 = st.tabs([
+            "Metrics Summary", "Split Comparison", "Confusion Matrices"
+        ])
+
+        with tab1:
+            st.subheader("Stratified Split (Active Checkpoint)")
+            col_a, col_b, col_c, col_d = st.columns(4)
+            col_a.metric("Accuracy", f"{strat_m['accuracy']:.1%}")
+            col_b.metric("Macro AUC", f"{strat_m['macro_auc']:.3f}")
+            col_c.metric("Malignant Sensitivity", f"{strat_m['malignant_sensitivity']:.1%}")
+            col_d.metric("Test Samples", f"{strat_m['test_set_size']}")
+
+            st.markdown("**Per-Class Classification Report**")
+            report_rows = []
+            for cls in ["Normal", "Benign", "Malignant"]:
+                r = strat_r[cls]
+                report_rows.append({
+                    "Class": cls,
+                    "Precision": f"{r['precision']:.3f}",
+                    "Recall": f"{r['recall']:.3f}",
+                    "F1-Score": f"{r['f1-score']:.3f}",
+                    "Support": int(r["support"]),
+                })
+            st.dataframe(pd.DataFrame(report_rows), hide_index=True, use_container_width=True)
+
+        with tab2:
+            st.subheader("Stratified vs Center-Holdout")
+            st.caption(
+                "The center-holdout split tests generalization to unseen hospital centers. "
+                "Lower scores indicate a generalization gap."
+            )
+
+            comparison_rows = []
+            for metric_name, key in [
+                ("Accuracy", "accuracy"),
+                ("Macro AUC", "macro_auc"),
+                ("Malignant Sensitivity", "malignant_sensitivity"),
+            ]:
+                s_val = strat_m[key]
+                c_val = center_m[key]
+                gap = c_val - s_val
+                comparison_rows.append({
+                    "Metric": metric_name,
+                    "Stratified": f"{s_val:.3f}",
+                    "Center Holdout": f"{c_val:.3f}",
+                    "Gap": f"{gap:+.3f}",
+                })
+            st.dataframe(pd.DataFrame(comparison_rows), hide_index=True, use_container_width=True)
+
+            st.markdown("**Per-Class Sensitivity Comparison**")
+            sens_rows = []
+            for cls in ["Normal", "Benign", "Malignant"]:
+                s_val = strat_m["per_class_sensitivity"][cls]
+                c_val = center_m["per_class_sensitivity"][cls]
+                sens_rows.append({
+                    "Class": cls,
+                    "Stratified": f"{s_val:.3f}",
+                    "Center Holdout": f"{c_val:.3f}",
+                    "Gap": f"{c_val - s_val:+.3f}",
+                })
+            st.dataframe(pd.DataFrame(sens_rows), hide_index=True, use_container_width=True)
+
+            st.markdown("**Per-Class AUC Comparison**")
+            auc_rows = []
+            for cls in ["Normal", "Benign", "Malignant"]:
+                s_val = strat_m["per_class_auc"][cls]
+                c_val = center_m["per_class_auc"][cls]
+                auc_rows.append({
+                    "Class": cls,
+                    "Stratified": f"{s_val:.3f}",
+                    "Center Holdout": f"{c_val:.3f}",
+                    "Gap": f"{c_val - s_val:+.3f}",
+                })
+            st.dataframe(pd.DataFrame(auc_rows), hide_index=True, use_container_width=True)
+
+        with tab3:
+            st.subheader("Confusion Matrices")
+            cm_col1, cm_col2 = st.columns(2)
+            strat_cm = RESULTS_DIR / "stratified" / "confusion_matrix_normalized.png"
+            center_cm = RESULTS_DIR / "center_holdout" / "confusion_matrix_normalized.png"
+            with cm_col1:
+                st.markdown("**Stratified**")
+                if strat_cm.exists():
+                    st.image(str(strat_cm), use_container_width=True)
+            with cm_col2:
+                st.markdown("**Center Holdout**")
+                if center_cm.exists():
+                    st.image(str(center_cm), use_container_width=True)
+    else:
+        st.info(
+            "Model performance metrics not available. "
+            "Run `make evaluate` to generate evaluation results."
+        )
 
 
 if __name__ == "__main__":
