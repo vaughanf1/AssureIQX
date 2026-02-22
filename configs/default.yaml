@@ -10,7 +10,7 @@ data:
   raw_dir: data_raw
   splits_dir: data/splits
   image_size: 380
-  num_workers: 4
+  num_workers: 0
   train_split: 0.70
   val_split: 0.15
   test_split: 0.15
