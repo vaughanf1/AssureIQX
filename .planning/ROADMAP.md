@@ -20,6 +20,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 6: Explainability and Inference** - Grad-CAM heatmaps, curated gallery, annotation comparison, single-image and batch inference
 - [x] **Phase 7: Documentation and Reports** - Model card, PoC report with clinical framing and limitations
 - [ ] **Phase 8: Streamlit Demo (Optional)** - Interactive image upload with prediction and Grad-CAM overlay
+- [ ] **Phase 9: Model Improvement** - Annotation-guided training, architecture upgrades (EfficientNet-B2/B3, ResNet-50-CBAM), and re-evaluation
 
 ## Phase Details
 
@@ -147,6 +148,25 @@ Plans:
 Plans:
 - [ ] 08-01-PLAN.md -- Streamlit demo app with image upload, prediction, confidence bars, and Grad-CAM overlay
 
+### Phase 9: Model Improvement
+**Goal**: Improve classification accuracy to close the gap with the BTXRD paper baseline by incorporating annotation masks into training and upgrading to stronger architectures recommended for bone tumor classification
+**Depends on**: Phase 5 (trained models and evaluation pipeline)
+**Plans**: 2 plans
+
+Plans:
+- [ ] 09-01-PLAN.md -- Multi-architecture support (ResNet-CBAM, EfficientNet-B3) + benchmark orchestration script
+- [ ] 09-02-PLAN.md -- Run experiment grid (4 architectures x 2 splits), compare results, update config and docs
+
+**Details:**
+Key improvements based on co-founder (Tom Jeys) feedback:
+1. **Annotation-guided training** — Use LabelMe bounding boxes/segmentation masks during training (attention guidance, ROI cropping, or multi-task learning) instead of only for Grad-CAM evaluation
+2. **Architecture upgrades** — Benchmark EfficientNet-B2/B3, ResNet-50-CBAM, and potentially Bone-CNN against current EfficientNet-B0 baseline
+3. **Re-evaluation** — Run full eval pipeline (Phase 5) on improved models to measure gains
+4. **Paper context** — Reference BTXRD paper methodology for training guidance
+
+Current baseline: 67.9% accuracy (stratified), 47.2% (center-holdout)
+Paper baseline: ~84% accuracy (YOLOv8s-cls, 80/20 random split)
+
 ## Progress
 
 **Execution Order:**
@@ -162,3 +182,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 6. Explainability and Inference | 2/2 | Complete | 2026-02-20 |
 | 7. Documentation and Reports | 2/2 | Complete | 2026-02-21 |
 | 8. Streamlit Demo (Optional) | 0/1 | Not started | - |
+| 9. Model Improvement | 0/2 | Not started | - |
