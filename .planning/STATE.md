@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-19)
 
 **Core value:** Deliver a reproducible, auditable 3-class bone tumor classification baseline with clear explainability outputs that a clinician can inspect and trust.
-**Current focus:** Phase 7 - Documentation and Reports (Complete)
+**Current focus:** Phase 9 - Model Improvement (In Progress)
 
 ## Current Position
 
-Phase: 7 of 8 (Documentation and Reports) -- Complete
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-02-21 -- Completed 07-02-PLAN.md
+Phase: 9 of 9 (Model Improvement) -- In Progress
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-02-22 -- Completed 09-01-PLAN.md
 
-Progress: [███████████████░] 15/16 (94%)
+Progress: [████████████████░] 16/18 (89%)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 15
-- Average duration: 5.3 min
-- Total execution time: 83 min
+- Total plans completed: 16
+- Average duration: 5.2 min
+- Total execution time: 87 min
 
 **By Phase:**
 
@@ -34,10 +34,11 @@ Progress: [███████████████░] 15/16 (94%)
 | 05 Evaluation | 2/2 | 24 min | 12 min |
 | 06 Explainability | 2/2 | 5 min | 2.5 min |
 | 07 Documentation | 2/2 | 7 min | 3.5 min |
+| 09 Model Improvement | 1/2 | 4 min | 4 min |
 
 **Recent Trend:**
-- Last 5 plans: 05-02 (14 min), 06-01 (2 min), 06-02 (3 min), 07-01 (5 min), 07-02 (2 min)
-- Trend: Documentation plans efficient due to well-structured data sources from prior phases
+- Last 5 plans: 06-01 (2 min), 06-02 (3 min), 07-01 (5 min), 07-02 (2 min), 09-01 (4 min)
+- Trend: Infrastructure/scaffold plans remain fast; experiment execution (09-02) will be longer
 
 *Updated after each plan completion*
 
@@ -48,6 +49,7 @@ Progress: [███████████████░] 15/16 (94%)
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- [Roadmap]: 9-phase pipeline (Phase 9 added for model improvement per co-founder feedback)
 - [Roadmap]: 8-phase sequential pipeline following data dependency chain
 - [Roadmap]: Dual split strategy (stratified + center holdout) implemented in Phase 3
 - [Roadmap]: Evaluation metric suite designed before training (Phase 5 criteria defined upfront)
@@ -100,10 +102,19 @@ Recent decisions affecting current work:
 - [07-02]: 10-section README structure for progressive disclosure
 - [07-02]: Report target verifies docs instead of echoing manual message
 - [07-02]: All target uses train-all for both splits
+- [09-01]: BTXRDClassifier accepts **kwargs for flexible timm passthrough (block_args for CBAM)
+- [09-01]: gradcam_target_layer: bn2 for EfficientNet, layer4[-1] for ResNet, then fallback walk
+- [09-01]: factory.py reads model.attn_layer from config and converts to block_args dict
+- [09-01]: Benchmark script uses subprocess isolation for train.py/eval.py calls
+- [09-01]: Experiment checkpoints renamed to best_{split}_{exp_id}.pt to prevent overwrites
 
 ### Pending Todos
 
 None.
+
+### Roadmap Evolution
+
+- Phase 9 added (2026-02-22): Model Improvement — annotation-guided training, architecture upgrades (EfficientNet-B2/B3, ResNet-50-CBAM), re-evaluation. Motivated by co-founder feedback on low accuracy vs paper baseline.
 
 ### Blockers/Concerns
 
@@ -115,6 +126,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-21T02:24Z
-Stopped at: Completed 07-02-PLAN.md
+Last session: 2026-02-22T00:42Z
+Stopped at: Completed 09-01-PLAN.md
 Resume file: None
