@@ -1,0 +1,27 @@
+{
+  "split_strategy": "center",
+  "test_set_size": 808,
+  "macro_auc": 0.6267292683029208,
+  "per_class_auc": {
+    "Normal": 0.6532567049808429,
+    "Benign": 0.5735920782366106,
+    "Malignant": 0.6533390216913088
+  },
+  "per_class_average_precision": {
+    "Normal": 0.5341029796319379,
+    "Benign": 0.5852478899284694,
+    "Malignant": 0.25478404999353244
+  },
+  "per_class_sensitivity": {
+    "Normal": 0.26223776223776224,
+    "Benign": 0.6433734939759036,
+    "Malignant": 0.3644859813084112
+  },
+  "per_class_specificity": {
+    "Normal": 0.8946360153256705,
+    "Benign": 0.4122137404580153,
+    "Malignant": 0.7988587731811697
+  },
+  "malignant_sensitivity": 0.3644859813084112,
+  "accuracy": 0.4715346534653465
+}

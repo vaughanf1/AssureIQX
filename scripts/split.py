@@ -26,6 +26,7 @@ from src.data.split_utils import (
     center_holdout_split,
     compute_duplicate_groups,
     derive_label,
+    random_split,
     save_split_csv,
     stratified_split,
 )
@@ -246,17 +247,48 @@ def main() -> None:
         df,
     )
 
+    # ── Random split (paper replication) ───────────────────
+    print("=== RANDOM SPLIT (80/20 — paper replication) ===")
+    print("WARNING: No stratification or duplicate grouping (matches paper protocol)")
+
+    df_r_train, df_r_val, df_r_test = random_split(
+        df,
+        val_ratio=0.20,
+        seed=seed,
+    )
+
+    save_split_csv(df_r_train, "train", "random", splits_dir)
+    save_split_csv(df_r_val, "val", "random", splits_dir)
+    save_split_csv(df_r_test, "test", "random", splits_dir)
+
+    print("\nRandom split class distribution:")
+    _print_class_distribution(df_r_train, "train")
+    _print_class_distribution(df_r_val, "val")
+
+    # Simplified validation: overlaps + totals only (no dup group check)
+    print(f"\n--- Validation: random ---")
+    overlap = set(df_r_train["image_id"]) & set(df_r_val["image_id"])
+    assert len(overlap) == 0, f"FAIL: {len(overlap)} image_ids overlap between train and val"
+    print("  [PASS] No image_id overlaps between train and val")
+    total = len(df_r_train) + len(df_r_val)
+    assert total == expected_count, f"FAIL: Expected {expected_count} images, got {total}"
+    print(f"  [PASS] All {expected_count} images accounted for")
+    print("  [SKIP] Duplicate group check (deliberately skipped for paper replication)")
+    print()
+
     # ── Summary ─────────────────────────────────────────────
     print("=== SUMMARY ===")
     print(f"Total images: {expected_count}")
-    print(f"Strategies: stratified, center-holdout")
+    print(f"Strategies: stratified, center-holdout, random")
     print(f"Output directory: {splits_dir}")
-    print(f"Files generated: 6 CSV manifests")
+    print(f"Files generated: 9 CSV manifests")
     print()
     print("Stratified splits:")
     print(f"  train: {len(df_s_train)}, val: {len(df_s_val)}, test: {len(df_s_test)}")
     print("Center-holdout splits:")
     print(f"  train: {len(df_c_train)}, val: {len(df_c_val)}, test: {len(df_c_test)}")
+    print("Random splits (paper replication):")
+    print(f"  train: {len(df_r_train)}, val: {len(df_r_val)} (test=copy of val)")
 
     # ── Leakage risk documentation ──────────────────────────
     print()

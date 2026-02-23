@@ -66,6 +66,8 @@ def train_one_epoch(
     criterion: nn.Module,
     optimizer: optim.Optimizer,
     device: torch.device,
+    scaler: torch.amp.GradScaler | None = None,
+    amp_dtype: torch.dtype | None = None,
 ) -> tuple[float, float]:
     """Train the model for one epoch.
 
@@ -75,6 +77,8 @@ def train_one_epoch(
         criterion: Loss function (weighted CrossEntropyLoss).
         optimizer: Optimizer instance.
         device: Device to run on.
+        scaler: GradScaler for CUDA AMP (None for MPS/CPU).
+        amp_dtype: dtype for autocast (torch.float16 or None to disable AMP).
 
     Returns:
         Tuple of (epoch_loss, epoch_accuracy) where epoch_loss is the
@@ -84,16 +88,35 @@ def train_one_epoch(
     running_loss = 0.0
     correct = 0
     total = 0
+    use_amp = amp_dtype is not None
+    device_type = "cuda" if device.type == "cuda" else device.type
 
     for images, labels in tqdm(loader, desc="  Train", leave=False):
         images = images.to(device)
         labels = labels.to(device)
 
         optimizer.zero_grad()
-        outputs = model(images)
-        loss = criterion(outputs, labels)
-        loss.backward()
-        optimizer.step()
+
+        if use_amp:
+            with torch.autocast(device_type=device_type, dtype=amp_dtype):
+                outputs = model(images)
+                loss = criterion(outputs, labels)
+            if scaler is not None:
+                scaler.scale(loss).backward()
+                scaler.unscale_(optimizer)
+                torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+                scaler.step(optimizer)
+                scaler.update()
+            else:
+                loss.backward()
+                torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+                optimizer.step()
+        else:
+            outputs = model(images)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+            optimizer.step()
 
         batch_size = labels.size(0)
         running_loss += loss.item() * batch_size
@@ -112,6 +135,7 @@ def validate(
     criterion: nn.Module,
     device: torch.device,
     num_classes: int = 3,
+    amp_dtype: torch.dtype | None = None,
 ) -> tuple[float, float, np.ndarray]:
     """Evaluate the model on validation data.
 
@@ -121,6 +145,7 @@ def validate(
         criterion: Loss function (unweighted CrossEntropyLoss).
         device: Device to run on.
         num_classes: Number of classes for per-class recall.
+        amp_dtype: dtype for autocast (torch.float16 or None to disable AMP).
 
     Returns:
         Tuple of (epoch_loss, epoch_accuracy, per_class_recall) where
@@ -132,14 +157,21 @@ def validate(
     total = 0
     all_preds: list[int] = []
     all_labels: list[int] = []
+    use_amp = amp_dtype is not None
+    device_type = "cuda" if device.type == "cuda" else device.type
 
     with torch.no_grad():
         for images, labels in tqdm(loader, desc="  Val  ", leave=False):
             images = images.to(device)
             labels = labels.to(device)
 
-            outputs = model(images)
-            loss = criterion(outputs, labels)
+            if use_amp:
+                with torch.autocast(device_type=device_type, dtype=amp_dtype):
+                    outputs = model(images)
+                    loss = criterion(outputs, labels)
+            else:
+                outputs = model(images)
+                loss = criterion(outputs, labels)
 
             batch_size = labels.size(0)
             running_loss += loss.item() * batch_size
@@ -284,16 +316,26 @@ def main() -> None:
 
     # ── Split strategy ────────────────────────────────────
     split_strategy = cfg["training"]["split_strategy"]
-    split_prefix = "stratified" if split_strategy == "stratified" else "center"
+    SPLIT_PREFIX = {"stratified": "stratified", "center": "center", "random": "random"}
+    split_prefix = SPLIT_PREFIX.get(split_strategy, split_strategy)
     logger.info("Split strategy: %s (prefix: %s)", split_strategy, split_prefix)
 
     # ── File paths ────────────────────────────────────────
     train_csv = PROJECT_ROOT / cfg["data"]["splits_dir"] / f"{split_prefix}_train.csv"
     val_csv = PROJECT_ROOT / cfg["data"]["splits_dir"] / f"{split_prefix}_val.csv"
-    images_dir = PROJECT_ROOT / cfg["data"]["raw_dir"] / "images"
-    results_dir = PROJECT_ROOT / cfg["paths"]["results_dir"] / (
-        "stratified" if split_strategy == "stratified" else "center_holdout"
-    )
+
+    # Use pre-resized cached images if available (10x faster I/O)
+    image_size = cfg["data"]["image_size"]
+    cache_dir = PROJECT_ROOT / "data_cache" / f"images_{image_size}"
+    raw_images_dir = PROJECT_ROOT / cfg["data"]["raw_dir"] / "images"
+    if cache_dir.is_dir() and len(list(cache_dir.glob("*"))) > 0:
+        images_dir = cache_dir
+        logger.info("Using cached pre-resized images from %s", cache_dir)
+    else:
+        images_dir = raw_images_dir
+        logger.info("No cached images at %s — loading from raw (slower)", cache_dir)
+    RESULTS_DIR_NAME = {"stratified": "stratified", "center": "center_holdout", "random": "random"}
+    results_dir = PROJECT_ROOT / cfg["paths"]["results_dir"] / RESULTS_DIR_NAME.get(split_strategy, split_strategy)
     checkpoints_dir = PROJECT_ROOT / cfg["paths"]["checkpoints_dir"]
 
     results_dir.mkdir(parents=True, exist_ok=True)
@@ -354,9 +396,16 @@ def main() -> None:
     model = create_model(cfg).to(device)
     logger.info("Model created: %s", cfg["model"]["backbone"])
 
-    # ── Class weights (from training set only) ────────────
+    # ── Class weights (from ORIGINAL distribution, not augmented) ────
+    # When using annotation-guided training, compute weights from the base
+    # dataset to avoid skewing toward the augmented tumor classes.
+    if hasattr(train_dataset, "base"):
+        base_labels = train_dataset.base.labels
+        logger.info("Computing class weights from base distribution (%d samples)", len(base_labels))
+    else:
+        base_labels = train_dataset.labels
     class_weights = compute_class_weights(
-        train_dataset.labels, cfg["model"]["num_classes"]
+        base_labels, cfg["model"]["num_classes"]
     ).to(device)
     logger.info("Class weights: %s", class_weights.tolist())
 
@@ -412,6 +461,18 @@ def main() -> None:
         patience=cfg["training"]["early_stopping_patience"]
     )
 
+    # ── Mixed Precision (AMP) Setup ─────────────────────
+    amp_dtype = None
+    scaler = None
+    if device.type == "cuda":
+        amp_dtype = torch.float16
+        scaler = torch.amp.GradScaler("cuda")
+        logger.info("AMP enabled: float16 with GradScaler (CUDA)")
+    else:
+        # MPS float16 is numerically unstable with class weights + label smoothing
+        # Speed gain is minimal with cached images; float32 is safer
+        logger.info("AMP disabled (%s)", device.type)
+
     # ── Training loop ─────────────────────────────────────
     log_rows: list[dict] = []
     best_val_loss = float("inf")
@@ -427,13 +488,19 @@ def main() -> None:
 
         # Train
         train_loss, train_acc = train_one_epoch(
-            model, train_loader, train_criterion, optimizer, device
+            model, train_loader, train_criterion, optimizer, device,
+            scaler=scaler, amp_dtype=amp_dtype,
         )
 
         # Validate (with UNWEIGHTED loss for clean early stopping signal)
         val_loss, val_acc, per_class_recall = validate(
-            model, val_loader, val_criterion, device, cfg["model"]["num_classes"]
+            model, val_loader, val_criterion, device, cfg["model"]["num_classes"],
+            amp_dtype=amp_dtype,
         )
+
+        # Clear MPS cache between epochs to prevent memory fragmentation
+        if device.type == "mps":
+            torch.mps.empty_cache()
 
         # Step scheduler
         scheduler.step()

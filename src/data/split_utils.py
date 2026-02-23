@@ -300,6 +300,58 @@ def center_holdout_split(
     return df_train, df_val, df_test
 
 
+def random_split(
+    df: pd.DataFrame,
+    val_ratio: float = 0.20,
+    seed: int = 42,
+    label_col: str = "label",
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """Simple random 80/20 split matching the BTXRD paper protocol.
+
+    Deliberately skips stratification and duplicate-group protection to
+    replicate the paper's evaluation methodology (Yao et al.).  The paper
+    uses a single validation set with no separate test set, so ``df_test``
+    is returned as a copy of ``df_val``.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Dataset with at least a ``label_col`` column and ``image_id``.
+    val_ratio : float
+        Fraction reserved for validation (default 0.20 for 80/20).
+    seed : int
+        Random state for reproducibility.
+    label_col : str
+        Column name for class labels (unused for stratification but
+        kept for interface consistency).
+
+    Returns
+    -------
+    tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]
+        (df_train, df_val, df_test) where df_test is a copy of df_val.
+    """
+    df = df.copy()
+
+    df_train, df_val = train_test_split(
+        df,
+        test_size=val_ratio,
+        random_state=seed,
+    )
+
+    df_train["split"] = "train"
+    df_val["split"] = "val"
+    df_test = df_val.copy()
+    df_test["split"] = "test"
+
+    logger.info(
+        "Random split: train=%d, val=%d (test=copy of val)",
+        len(df_train),
+        len(df_val),
+    )
+
+    return df_train, df_val, df_test
+
+
 def save_split_csv(
     df: pd.DataFrame,
     split_name: str,

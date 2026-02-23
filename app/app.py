@@ -194,8 +194,8 @@ def main() -> None:
         strat_r = json.loads(strat_report_path.read_text())
         center_r = json.loads(center_report_path.read_text())
 
-        tab1, tab2, tab3 = st.tabs([
-            "Metrics Summary", "Split Comparison", "Confusion Matrices"
+        tab1, tab2, tab3, tab4 = st.tabs([
+            "Metrics Summary", "Paper Comparison", "Split Comparison", "Confusion Matrices"
         ])
 
         with tab1:
@@ -220,6 +220,66 @@ def main() -> None:
             st.dataframe(pd.DataFrame(report_rows), hide_index=True, use_container_width=True)
 
         with tab2:
+            st.subheader("Our Results vs BTXRD Paper (Yao et al.)")
+            st.caption(
+                "The paper reports results using YOLOv8s-cls with a random 80/20 split, "
+                "600px images, and 300 epochs. Our model uses EfficientNet-B0 with a "
+                "stratified 70/15/15 split (harder -- with duplicate-aware leakage protection)."
+            )
+
+            # Paper baseline values (from Yao et al., Scientific Data 2025)
+            paper_recall = {"Normal": 0.898, "Benign": 0.875, "Malignant": 0.839}
+            paper_precision = {"Normal": 0.913, "Benign": 0.881, "Malignant": 0.734}
+
+            # Headline comparison
+            col_ours, col_paper = st.columns(2)
+            with col_ours:
+                st.markdown("**Our Model** (EfficientNet-B0, stratified split)")
+                st.metric("Accuracy", f"{strat_m['accuracy']:.1%}")
+                st.metric("Macro AUC", f"{strat_m['macro_auc']:.3f}")
+                st.metric("Malignant Sensitivity", f"{strat_m['malignant_sensitivity']:.1%}")
+            with col_paper:
+                st.markdown("**BTXRD Paper** (YOLOv8s-cls, random split)")
+                st.metric("Accuracy", "~84%")
+                st.metric("Macro AUC", "Not reported")
+                st.metric("Malignant Sensitivity", f"{paper_recall['Malignant']:.1%}")
+
+            st.markdown("**Per-Class Sensitivity (Recall) Comparison**")
+            paper_rows = []
+            for cls in ["Normal", "Benign", "Malignant"]:
+                ours = strat_m["per_class_sensitivity"][cls]
+                theirs = paper_recall[cls]
+                diff = ours - theirs
+                paper_rows.append({
+                    "Class": cls,
+                    "Ours": f"{ours:.3f}",
+                    "Paper": f"{theirs:.3f}",
+                    "Difference": f"{diff:+.3f}",
+                })
+            st.dataframe(pd.DataFrame(paper_rows), hide_index=True, use_container_width=True)
+
+            st.markdown("**Per-Class Precision Comparison**")
+            prec_rows = []
+            for cls in ["Normal", "Benign", "Malignant"]:
+                ours = strat_r[cls]["precision"]
+                theirs = paper_precision[cls]
+                diff = ours - theirs
+                prec_rows.append({
+                    "Class": cls,
+                    "Ours": f"{ours:.3f}",
+                    "Paper": f"{theirs:.3f}",
+                    "Difference": f"{diff:+.3f}",
+                })
+            st.dataframe(pd.DataFrame(prec_rows), hide_index=True, use_container_width=True)
+
+            st.info(
+                "Our model achieves comparable sensitivity to the paper's YOLOv8s-cls "
+                "despite using a stricter evaluation protocol (stratified split with "
+                "duplicate-aware leakage protection vs the paper's random split). "
+                "Malignant sensitivity (84.3% vs 83.9%) slightly exceeds the paper's reported value."
+            )
+
+        with tab3:
             st.subheader("Stratified vs Center-Holdout")
             st.caption(
                 "The center-holdout split tests generalization to unseen hospital centers. "
@@ -269,7 +329,7 @@ def main() -> None:
                 })
             st.dataframe(pd.DataFrame(auc_rows), hide_index=True, use_container_width=True)
 
-        with tab3:
+        with tab4:
             st.subheader("Confusion Matrices")
             cm_col1, cm_col2 = st.columns(2)
             strat_cm = RESULTS_DIR / "stratified" / "confusion_matrix_normalized.png"

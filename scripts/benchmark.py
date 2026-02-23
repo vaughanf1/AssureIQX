@@ -7,10 +7,10 @@ center-holdout splits, evaluated, and results are collected into a
 comparison table.
 
 Experiment grid:
-  E1: EfficientNet-B0 baseline (no annotations)
-  E2: EfficientNet-B0 + annotations
-  E3: EfficientNet-B3 + annotations (300px)
-  E4: ResNet-50-CBAM + annotations (224px)
+  E1: EfficientNet-B0 baseline (224px, no annotations)
+  E2: EfficientNet-B0 + annotations (380px)
+  E3: EfficientNet-B3 + annotations (380px)
+  E4: ResNet-50-CBAM + annotations (380px)
 
 Outputs:
   results/experiments/{experiment_id}/  -- per-experiment eval results
@@ -51,41 +51,57 @@ EXPERIMENT_GRID = [
         "image_size": 224,
         "batch_size": 32,
         "dropout": 0.2,
+        "epochs": 80,
         "annotations": False,
         "attn_layer": None,
     },
     {
         "id": "E2_b0_annotated",
         "backbone": "efficientnet_b0",
-        "image_size": 224,
-        "batch_size": 32,
+        "image_size": 380,
+        "batch_size": 16,
         "dropout": 0.2,
+        "epochs": 80,
         "annotations": True,
         "attn_layer": None,
     },
     {
         "id": "E3_b3_annotated",
         "backbone": "efficientnet_b3",
-        "image_size": 300,
-        "batch_size": 16,
+        "image_size": 380,
+        "batch_size": 8,
         "dropout": 0.3,
+        "epochs": 80,
         "annotations": True,
         "attn_layer": None,
     },
     {
         "id": "E4_resnet50_cbam",
         "backbone": "resnet50",
-        "image_size": 224,
-        "batch_size": 16,
+        "image_size": 380,
+        "batch_size": 8,
         "dropout": 0.3,
+        "epochs": 80,
         "annotations": True,
         "attn_layer": "cbam",
+    },
+    {
+        "id": "E5_paper_replication",
+        "backbone": "efficientnet_b0",
+        "image_size": 600,
+        "batch_size": 8,
+        "dropout": 0.2,
+        "epochs": 300,
+        "annotations": False,
+        "attn_layer": None,
+        "split_strategies": ["random"],
+        "early_stopping_patience": 999,
     },
 ]
 
 SPLIT_STRATEGIES = ["stratified", "center"]
-SPLIT_PREFIX_MAP = {"stratified": "stratified", "center": "center"}
-SPLIT_DIR_MAP = {"stratified": "stratified", "center": "center_holdout"}
+SPLIT_PREFIX_MAP = {"stratified": "stratified", "center": "center", "random": "random"}
+SPLIT_DIR_MAP = {"stratified": "stratified", "center": "center_holdout", "random": "random"}
 
 
 def backup_checkpoints(checkpoints_dir: Path) -> bool:
@@ -136,6 +152,11 @@ def build_override_args(experiment: dict, split_strategy: str) -> list[str]:
         f"training.split_strategy={split_strategy}",
     ]
 
+    if experiment.get("epochs"):
+        overrides.append(f"training.epochs={experiment['epochs']}")
+        patience = experiment.get("early_stopping_patience", 20)
+        overrides.append(f"training.early_stopping_patience={patience}")
+
     if not experiment["annotations"]:
         overrides.append("data.annotations_dir=null")
 
@@ -174,8 +195,9 @@ def run_experiment(
     exp_results_dir.mkdir(parents=True, exist_ok=True)
 
     statuses = {}
+    exp_splits = experiment.get("split_strategies", SPLIT_STRATEGIES)
 
-    for split in SPLIT_STRATEGIES:
+    for split in exp_splits:
         split_prefix = SPLIT_PREFIX_MAP[split]
         split_dir_name = SPLIT_DIR_MAP[split]
         run_key = f"{exp_id}/{split}"
@@ -310,7 +332,7 @@ def generate_comparison(results_base: Path, experiments: list[dict]) -> None:
             "annotations": exp["annotations"],
         }
 
-        for split, dir_name in [("stratified", "stratified"), ("center", "center_holdout")]:
+        for split, dir_name in [("stratified", "stratified"), ("center", "center_holdout"), ("random", "random")]:
             metrics_path = results_base / exp_id / dir_name / "metrics_summary.json"
             if metrics_path.exists():
                 try:
@@ -354,6 +376,9 @@ def generate_comparison(results_base: Path, experiments: list[dict]) -> None:
         "center_accuracy",
         "center_macro_auc",
         "center_malignant_sensitivity",
+        "random_accuracy",
+        "random_macro_auc",
+        "random_malignant_sensitivity",
     ]
 
     with open(csv_path, "w", newline="") as f:
@@ -403,10 +428,11 @@ def generate_comparison(results_base: Path, experiments: list[dict]) -> None:
     header = (
         f"{'Experiment':<25} {'Backbone':<20} {'ImgSize':>7} {'Ann':>4} "
         f"{'Strat Acc':>10} {'Strat AUC':>10} {'Strat MalSens':>14} "
-        f"{'Center Acc':>11} {'Center AUC':>11} {'Center MalSens':>15}"
+        f"{'Center Acc':>11} {'Center AUC':>11} {'Center MalSens':>15} "
+        f"{'Rand Acc':>10} {'Rand AUC':>10} {'Rand MalSens':>13}"
     )
     logger.info(header)
-    logger.info("-" * 120)
+    logger.info("-" * 155)
 
     for row in rows:
         def _fmt(val: float | None) -> str:
@@ -426,12 +452,15 @@ def generate_comparison(results_base: Path, experiments: list[dict]) -> None:
             f"{_fmt(row.get('stratified_malignant_sensitivity')):>14} "
             f"{_fmt(row.get('center_accuracy')):>11} "
             f"{_fmt(row.get('center_macro_auc')):>11} "
-            f"{_fmt(row.get('center_malignant_sensitivity')):>15}"
+            f"{_fmt(row.get('center_malignant_sensitivity')):>15} "
+            f"{_fmt(row.get('random_accuracy')):>10} "
+            f"{_fmt(row.get('random_macro_auc')):>10} "
+            f"{_fmt(row.get('random_malignant_sensitivity')):>13}"
             f"{marker}"
         )
         logger.info(line)
 
-    logger.info("-" * 120)
+    logger.info("-" * 155)
     if valid_rows:
         logger.info("*** = Best experiment (by stratified accuracy)")
 
@@ -442,12 +471,14 @@ def main() -> None:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Experiments:
-  E1_b0_baseline    EfficientNet-B0 at 224px, no annotations
-  E2_b0_annotated   EfficientNet-B0 at 224px, with annotations
-  E3_b3_annotated   EfficientNet-B3 at 300px, with annotations
-  E4_resnet50_cbam  ResNet-50-CBAM at 224px, with annotations
+  E1_b0_baseline        EfficientNet-B0 at 224px, no annotations
+  E2_b0_annotated       EfficientNet-B0 at 380px, with annotations
+  E3_b3_annotated       EfficientNet-B3 at 380px, with annotations
+  E4_resnet50_cbam      ResNet-50-CBAM at 380px, with annotations
+  E5_paper_replication  EfficientNet-B0 at 600px, 300 epochs, random 80/20 split
 
-Each experiment is trained on both stratified and center-holdout splits.
+E1-E4 train on stratified + center-holdout splits.
+E5 trains only on the random split (paper replication protocol).
         """,
     )
     parser.add_argument(

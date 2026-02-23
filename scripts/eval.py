@@ -65,6 +65,11 @@ SPLIT_MAP = {
         "checkpoint": "best_center.pt",
         "test_csv": "center_test.csv",
     },
+    "random": {
+        "dir_name": "random",
+        "checkpoint": "best_random.pt",
+        "test_csv": "random_test.csv",
+    },
 }
 
 # BTXRD paper baseline (Yao et al., Scientific Data 2025)
@@ -385,10 +390,12 @@ def main() -> None:
         logger.info("Model loaded: %s", ckpt_config["model"]["backbone"])
 
         # ── Create test dataset and dataloader ────────────────
+        eval_image_size = ckpt_config["data"]["image_size"]
+        logger.info("Eval image size: %d (from checkpoint)", eval_image_size)
         test_dataset = BTXRDDataset(
             test_csv_path,
             images_dir,
-            get_test_transforms(cfg["data"]["image_size"]),
+            get_test_transforms(eval_image_size),
         )
         test_loader = create_dataloader(
             test_dataset,
