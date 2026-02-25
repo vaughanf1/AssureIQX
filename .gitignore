@@ -39,7 +39,9 @@ checkpoints/*.pt
 checkpoints/*.pth
 checkpoints/*.onnx
 checkpoints/*.pkl
+!checkpoints/best_stratified.pt
 *.pt
+!checkpoints/best_stratified.pt
 *.pth
 *.onnx
 
