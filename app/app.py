@@ -407,10 +407,6 @@ def page_specialist_challenge(model, class_names, device, image_size):
             st.rerun()
         return
 
-    # Progress
-    answered = len(st.session_state.challenge_answers)
-    st.progress(answered / total, text=f"{answered} / {total} answered")
-
     # Show images in a grid, 3 per row
     for i in range(0, total, 3):
         cols = st.columns(3)
@@ -434,6 +430,10 @@ def page_specialist_challenge(model, class_names, device, image_size):
                 )
                 if answer is not None:
                     st.session_state.challenge_answers[idx] = answer
+
+    # Count answers AFTER all radio buttons have been rendered
+    answered = len(st.session_state.challenge_answers)
+    st.progress(answered / total, text=f"{answered} / {total} answered")
 
     st.divider()
     if answered < total:
