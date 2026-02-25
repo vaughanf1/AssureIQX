@@ -22,7 +22,9 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
+import csv  # noqa: E402
 import json  # noqa: E402
+import random  # noqa: E402
 
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
@@ -42,6 +44,11 @@ from src.models.factory import create_model, get_device, load_checkpoint  # noqa
 # -- Constants ----------------------------------------------------------------
 DEFAULT_CHECKPOINT = PROJECT_ROOT / "checkpoints" / "best_stratified.pt"
 RESULTS_DIR = PROJECT_ROOT / "results"
+SPLITS_DIR = PROJECT_ROOT / "data" / "splits"
+IMAGES_DIR = PROJECT_ROOT / "data_raw" / "images"
+CHALLENGE_IMAGES_DIR = Path(__file__).resolve().parent / "challenge_images"
+CHALLENGE_SEED = 99
+CHALLENGE_PER_CLASS = 10
 
 
 @st.cache_resource
@@ -113,26 +120,46 @@ def run_inference(
     }
 
 
-def main() -> None:
-    """Main Streamlit application entry point."""
-    # Page config must be the first Streamlit call
-    st.set_page_config(
-        page_title="AssureXRay",
-        page_icon=":material/radiology:",
-        layout="wide",
-    )
+@st.cache_data
+def load_challenge_images():
+    """Select 30 test images (10 per class) in a fixed random order."""
+    test_csv = SPLITS_DIR / "stratified_test.csv"
+    if not test_csv.exists():
+        return None
+    rows_by_class = {"Normal": [], "Benign": [], "Malignant": []}
+    with open(test_csv) as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            label = row["label"]
+            if label in rows_by_class:
+                rows_by_class[label].append(row["image_id"])
+    rng = random.Random(CHALLENGE_SEED)
+    selected = []
+    for label in ["Normal", "Benign", "Malignant"]:
+        imgs = rows_by_class[label]
+        chosen = rng.sample(imgs, min(CHALLENGE_PER_CLASS, len(imgs)))
+        for img_id in chosen:
+            selected.append({"image_id": img_id, "true_label": label})
+    rng.shuffle(selected)
+    return selected
 
-    # -- Title and disclaimer (always visible) --------------------------------
-    st.title("AssureXRay -- Bone Tumor Classification")
-    st.warning(
-        "**NOT FOR CLINICAL USE -- Research Prototype Only.** "
-        "This tool is for demonstration purposes only and has not been "
-        "validated for clinical decision-making."
-    )
 
-    # -- Load model (cached) --------------------------------------------------
-    model, class_names, device, image_size = load_model(str(DEFAULT_CHECKPOINT))
+def get_ai_prediction(model, class_names, device, image_size, image_path):
+    """Run the AI model on a single image and return the predicted class."""
+    pil_img = Image.open(image_path).convert("RGB")
+    image_np = np.array(pil_img)
+    transform = get_test_transforms(image_size)
+    transformed = transform(image=image_np)
+    input_tensor = transformed["image"].unsqueeze(0).to(device)
+    with torch.no_grad():
+        logits = model(input_tensor)
+        probs = F.softmax(logits, dim=1)
+    pred_idx = probs.argmax(dim=1).item()
+    return class_names[pred_idx]
 
+
+def page_classifier(model, class_names, device, image_size):
+    """Main classifier page with upload and model performance."""
     # -- File upload ----------------------------------------------------------
     uploaded_file = st.file_uploader(
         "Upload a bone radiograph",
@@ -143,30 +170,22 @@ def main() -> None:
         pil_image = Image.open(uploaded_file).convert("RGB")
         image_np = np.array(pil_image)
 
-        # Preprocess with the same deterministic pipeline as evaluation
         transform = get_test_transforms(image_size)
         transformed = transform(image=image_np)
         input_tensor = transformed["image"].unsqueeze(0)
 
-        # Run inference + Grad-CAM
         with st.spinner("Analyzing image..."):
             result = run_inference(model, input_tensor, class_names, device)
 
-        # -- Results layout ---------------------------------------------------
         col1, col2 = st.columns(2)
-
         with col1:
             st.subheader("Uploaded Image")
             st.image(pil_image, use_container_width=True)
-
         with col2:
             st.subheader("Grad-CAM Overlay")
             st.image(result["overlay"], use_container_width=True)
 
-        # Prediction heading
         st.subheader(f"Prediction: {result['pred_class']}")
-
-        # Confidence bar chart
         scores_df = pd.DataFrame(
             {
                 "Class": result["class_names"],
@@ -347,6 +366,177 @@ def main() -> None:
             "Model performance metrics not available. "
             "Run `make evaluate` to generate evaluation results."
         )
+
+
+def page_specialist_challenge(model, class_names, device, image_size):
+    """Specialist Challenge: human vs AI on 30 X-rays."""
+    st.header("Specialist Challenge")
+    st.markdown(
+        "**Can you beat the AI?** You will be shown 30 bone X-rays "
+        "(10 Normal, 10 Benign, 10 Malignant) in random order. "
+        "Classify each one, then see how you compare against the AI model."
+    )
+
+    challenge_images = load_challenge_images()
+    if challenge_images is None:
+        st.error("Test split CSV not found. Cannot load challenge images.")
+        return
+
+    # Check that images directory exists
+    if not CHALLENGE_IMAGES_DIR.exists():
+        st.error(
+            "Challenge images not found. Expected folder: app/challenge_images/"
+        )
+        return
+
+    total = len(challenge_images)
+
+    # Initialise session state
+    if "challenge_answers" not in st.session_state:
+        st.session_state.challenge_answers = {}
+    if "challenge_submitted" not in st.session_state:
+        st.session_state.challenge_submitted = False
+
+    if st.session_state.challenge_submitted:
+        _show_challenge_results(
+            challenge_images, model, class_names, device, image_size
+        )
+        if st.button("Restart Challenge"):
+            st.session_state.challenge_answers = {}
+            st.session_state.challenge_submitted = False
+            st.rerun()
+        return
+
+    # Progress
+    answered = len(st.session_state.challenge_answers)
+    st.progress(answered / total, text=f"{answered} / {total} answered")
+
+    # Show images in a grid, 3 per row
+    for i in range(0, total, 3):
+        cols = st.columns(3)
+        for j, col in enumerate(cols):
+            idx = i + j
+            if idx >= total:
+                break
+            item = challenge_images[idx]
+            img_path = CHALLENGE_IMAGES_DIR / item["image_id"]
+            with col:
+                st.markdown(f"**Image {idx + 1}**")
+                if img_path.exists():
+                    st.image(str(img_path), use_container_width=True)
+                else:
+                    st.warning(f"Image not found: {item['image_id']}")
+                answer = st.radio(
+                    f"Your diagnosis for Image {idx + 1}",
+                    options=["Normal", "Benign", "Malignant"],
+                    index=None,
+                    key=f"challenge_{idx}",
+                )
+                if answer is not None:
+                    st.session_state.challenge_answers[idx] = answer
+
+    st.divider()
+    if answered < total:
+        st.info(f"Please classify all {total} images before submitting.")
+    if st.button("Submit Answers", disabled=(answered < total)):
+        st.session_state.challenge_submitted = True
+        st.rerun()
+
+
+def _show_challenge_results(challenge_images, model, class_names, device, image_size):
+    """Display results comparing the specialist's answers to the AI."""
+    answers = st.session_state.challenge_answers
+    total = len(challenge_images)
+
+    human_correct = 0
+    ai_correct = 0
+    detail_rows = []
+
+    for idx, item in enumerate(challenge_images):
+        true_label = item["true_label"]
+        human_answer = answers.get(idx, "")
+
+        img_path = CHALLENGE_IMAGES_DIR / item["image_id"]
+        if img_path.exists():
+            ai_answer = get_ai_prediction(
+                model, class_names, device, image_size, img_path
+            )
+        else:
+            ai_answer = "N/A"
+
+        h_ok = human_answer == true_label
+        a_ok = ai_answer == true_label
+        if h_ok:
+            human_correct += 1
+        if a_ok:
+            ai_correct += 1
+
+        detail_rows.append({
+            "Image": idx + 1,
+            "True Label": true_label,
+            "Your Answer": human_answer,
+            "You": "Correct" if h_ok else "Wrong",
+            "AI Answer": ai_answer,
+            "AI": "Correct" if a_ok else "Wrong",
+        })
+
+    # Headline scores
+    st.subheader("Results")
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Your Score", f"{human_correct} / {total} ({human_correct/total:.0%})")
+    col2.metric("AI Score", f"{ai_correct} / {total} ({ai_correct/total:.0%})")
+    diff = human_correct - ai_correct
+    if diff > 0:
+        verdict = "You beat the AI!"
+    elif diff < 0:
+        verdict = "The AI wins this round."
+    else:
+        verdict = "It's a tie!"
+    col3.metric("Verdict", verdict)
+
+    # Per-class breakdown
+    st.subheader("Per-Class Breakdown")
+    for cls in ["Normal", "Benign", "Malignant"]:
+        cls_items = [r for r in detail_rows if r["True Label"] == cls]
+        h_cls = sum(1 for r in cls_items if r["You"] == "Correct")
+        a_cls = sum(1 for r in cls_items if r["AI"] == "Correct")
+        n_cls = len(cls_items)
+        st.markdown(
+            f"**{cls}:** You {h_cls}/{n_cls} -- AI {a_cls}/{n_cls}"
+        )
+
+    # Full detail table
+    st.subheader("Detailed Breakdown")
+    df = pd.DataFrame(detail_rows)
+    st.dataframe(df, hide_index=True, use_container_width=True)
+
+
+def main() -> None:
+    """Main Streamlit application entry point."""
+    st.set_page_config(
+        page_title="AssureXRay",
+        page_icon=":material/radiology:",
+        layout="wide",
+    )
+
+    st.title("AssureXRay -- Bone Tumor Classification")
+    st.warning(
+        "**NOT FOR CLINICAL USE -- Research Prototype Only.** "
+        "This tool is for demonstration purposes only and has not been "
+        "validated for clinical decision-making."
+    )
+
+    page = st.sidebar.radio(
+        "Navigation",
+        options=["Classifier", "Specialist Challenge"],
+    )
+
+    model, class_names, device, image_size = load_model(str(DEFAULT_CHECKPOINT))
+
+    if page == "Classifier":
+        page_classifier(model, class_names, device, image_size)
+    else:
+        page_specialist_challenge(model, class_names, device, image_size)
 
 
 if __name__ == "__main__":
