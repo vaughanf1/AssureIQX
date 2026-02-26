@@ -396,6 +396,37 @@ def page_specialist_challenge(model, class_names, device, image_size):
         st.session_state.challenge_answers = {}
     if "challenge_submitted" not in st.session_state:
         st.session_state.challenge_submitted = False
+    if "participant_registered" not in st.session_state:
+        st.session_state.participant_registered = False
+    if "participant_info" not in st.session_state:
+        st.session_state.participant_info = {}
+
+    # Participant details form
+    if not st.session_state.participant_registered:
+        st.subheader("Participant Details")
+        st.markdown(
+            "Your details will be used for authorship on any resulting publication."
+        )
+        with st.form("participant_form"):
+            name = st.text_input("Full Name *")
+            unit = st.text_input("Unit / Hospital / Institution *")
+            years = st.number_input(
+                "Years of Experience in Orthopaedic Oncology *",
+                min_value=0, max_value=60, value=None, step=1,
+            )
+            submitted = st.form_submit_button("Start Challenge")
+            if submitted:
+                if not name or not unit or years is None:
+                    st.error("Please fill in all fields.")
+                else:
+                    st.session_state.participant_info = {
+                        "name": name,
+                        "unit": unit,
+                        "years_experience": years,
+                    }
+                    st.session_state.participant_registered = True
+                    st.rerun()
+        return
 
     if st.session_state.challenge_submitted:
         _show_challenge_results(
@@ -404,6 +435,8 @@ def page_specialist_challenge(model, class_names, device, image_size):
         if st.button("Restart Challenge"):
             st.session_state.challenge_answers = {}
             st.session_state.challenge_submitted = False
+            st.session_state.participant_registered = False
+            st.session_state.participant_info = {}
             st.rerun()
         return
 
@@ -443,6 +476,31 @@ def page_specialist_challenge(model, class_names, device, image_size):
         st.rerun()
 
 
+def _save_response(participant_info, detail_rows, human_correct, ai_correct, total):
+    """Append this participant's response to a CSV log."""
+    import datetime
+
+    responses_path = PROJECT_ROOT / "app" / "challenge_responses.csv"
+    is_new = not responses_path.exists()
+    with open(responses_path, "a", newline="") as f:
+        writer = csv.writer(f)
+        if is_new:
+            writer.writerow([
+                "timestamp", "name", "unit", "years_experience",
+                "human_score", "ai_score", "total",
+            ] + [f"image_{i+1}" for i in range(total)])
+        row = [
+            datetime.datetime.now().isoformat(),
+            participant_info.get("name", ""),
+            participant_info.get("unit", ""),
+            participant_info.get("years_experience", ""),
+            human_correct,
+            ai_correct,
+            total,
+        ] + [r["Your Answer"] for r in detail_rows]
+        writer.writerow(row)
+
+
 def _show_challenge_results(challenge_images, model, class_names, device, image_size):
     """Display results comparing the specialist's answers to the AI."""
     answers = st.session_state.challenge_answers
@@ -479,6 +537,18 @@ def _show_challenge_results(challenge_images, model, class_names, device, image_
             "AI Answer": ai_answer,
             "AI": "Correct" if a_ok else "Wrong",
         })
+
+    # Participant info
+    info = st.session_state.get("participant_info", {})
+    if info:
+        st.markdown(
+            f"**Participant:** {info.get('name', 'N/A')} | "
+            f"**Unit:** {info.get('unit', 'N/A')} | "
+            f"**Experience:** {info.get('years_experience', 'N/A')} years"
+        )
+
+    # Save response to CSV
+    _save_response(info, detail_rows, human_correct, ai_correct, total)
 
     # Headline scores
     st.subheader("Results")
