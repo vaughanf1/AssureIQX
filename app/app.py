@@ -594,7 +594,7 @@ def main() -> None:
         },
     )
 
-    # Hide GitHub icon, footer, and deploy button
+    # Hide GitHub icon, footer, and deploy button + keep-alive ping
     st.markdown(
         """
         <style>
@@ -603,6 +603,12 @@ def main() -> None:
         footer {visibility: hidden;}
         header [data-testid="stStatusWidget"] {display: none;}
         </style>
+        <script>
+        // Ping the app every 5 minutes to prevent Streamlit Cloud sleep
+        setInterval(function() {
+            fetch(window.location.href, {method: 'HEAD', cache: 'no-store'});
+        }, 5 * 60 * 1000);
+        </script>
         """,
         unsafe_allow_html=True,
     )
