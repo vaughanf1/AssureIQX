@@ -620,17 +620,12 @@ def main() -> None:
         "validated for clinical decision-making."
     )
 
-    page = st.sidebar.radio(
-        "Navigation",
-        options=["Classifier", "Specialist Challenge"],
-    )
-
     model, class_names, device, image_size = load_model(str(DEFAULT_CHECKPOINT))
 
-    if page == "Classifier":
-        page_classifier(model, class_names, device, image_size)
-    else:
-        page_specialist_challenge(model, class_names, device, image_size)
+    page_classifier(model, class_names, device, image_size)
+
+    st.divider()
+    page_specialist_challenge(model, class_names, device, image_size)
 
 
 if __name__ == "__main__":
