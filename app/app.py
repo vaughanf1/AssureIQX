@@ -622,10 +622,10 @@ def main() -> None:
 
     model, class_names, device, image_size = load_model(str(DEFAULT_CHECKPOINT))
 
-    page_classifier(model, class_names, device, image_size)
+    page_specialist_challenge(model, class_names, device, image_size)
 
     st.divider()
-    page_specialist_challenge(model, class_names, device, image_size)
+    page_classifier(model, class_names, device, image_size)
 
 
 if __name__ == "__main__":
