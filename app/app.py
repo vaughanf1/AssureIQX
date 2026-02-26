@@ -517,6 +517,24 @@ def main() -> None:
         page_title="AssureXRay",
         page_icon=":material/radiology:",
         layout="wide",
+        menu_items={
+            "Get help": None,
+            "Report a Bug": None,
+            "About": None,
+        },
+    )
+
+    # Hide GitHub icon, footer, and deploy button
+    st.markdown(
+        """
+        <style>
+        .stAppDeployButton {display: none;}
+        #MainMenu {visibility: hidden;}
+        footer {visibility: hidden;}
+        header [data-testid="stStatusWidget"] {display: none;}
+        </style>
+        """,
+        unsafe_allow_html=True,
     )
 
     st.title("AssureXRay -- Bone Tumor Classification")
