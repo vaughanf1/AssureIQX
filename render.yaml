@@ -1,0 +1,30 @@
+# Render Blueprint for the AssureXRay Streamlit demo.
+# Provisions a single always-on web service with a persistent disk for
+# specialist-challenge responses. Connect this repo as a Blueprint in the
+# Render dashboard (New > Blueprint) and every push to main auto-deploys.
+services:
+  - type: web
+    name: assurexray
+    runtime: python
+    plan: standard            # 2 GB RAM — needed for PyTorch + Streamlit
+    region: frankfurt         # change to your nearest region if preferred
+    branch: main
+    autoDeploy: true
+    # Install CPU-only PyTorch first (avoids the ~2 GB CUDA wheel), then the
+    # rest. torch 2.6.0+cpu satisfies the `torch==2.6.0` pin in requirements.txt
+    # so it is not reinstalled from PyPI.
+    buildCommand: |
+      pip install --upgrade pip
+      pip install torch==2.6.0+cpu torchvision==0.21.0+cpu --index-url https://download.pytorch.org/whl/cpu
+      pip install -r requirements.txt
+    startCommand: streamlit run app/app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true
+    healthCheckPath: /_stcore/health
+    disk:
+      name: assurexray-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: CHALLENGE_RESPONSES_PATH
+        value: /var/data/challenge_responses.csv

@@ -15,6 +15,7 @@ Implemented in: Phase 8
 
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 
@@ -49,6 +50,16 @@ IMAGES_DIR = PROJECT_ROOT / "data_raw" / "images"
 CHALLENGE_IMAGES_DIR = Path(__file__).resolve().parent / "challenge_images"
 CHALLENGE_SEED = 99
 CHALLENGE_PER_CLASS = 10
+
+# Where specialist challenge responses are written. Defaults to a file next to
+# the app, but on ephemeral hosts (e.g. Render) point this at a persistent disk
+# via the CHALLENGE_RESPONSES_PATH env var so responses survive restarts/deploys.
+CHALLENGE_RESPONSES_PATH = Path(
+    os.environ.get(
+        "CHALLENGE_RESPONSES_PATH",
+        Path(__file__).resolve().parent / "challenge_responses.csv",
+    )
+)
 
 
 @st.cache_resource
@@ -480,7 +491,8 @@ def _save_response(participant_info, detail_rows, human_correct, ai_correct, tot
     """Append this participant's response to a CSV log."""
     import datetime
 
-    responses_path = PROJECT_ROOT / "app" / "challenge_responses.csv"
+    responses_path = CHALLENGE_RESPONSES_PATH
+    responses_path.parent.mkdir(parents=True, exist_ok=True)
     is_new = not responses_path.exists()
     with open(responses_path, "a", newline="") as f:
         writer = csv.writer(f)
